@@ -1,17 +1,17 @@
-<footer class="site-footer">
-  <div class="site-footer__inner">
+<footer class="bg-dark text-on-dark px-4 py-6 mt-auto">
+  <div class="max-w-[1100px] mx-auto grid grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
     <div>
-      <h3>Адрес</h3>
-      <p>г. Москва, ул. Примерная, д. 1</p>
-      <p>Пн–Вс 10:00–21:00</p>
+      <h3 class="mt-0 mb-2 text-[0.95rem] text-accent-orange">Адрес</h3>
+      <p class="my-1 text-[0.9rem]">г. Москва, ул. Примерная, д. 1</p>
+      <p class="my-1 text-[0.9rem]">Пн–Вс 10:00–21:00</p>
     </div>
     <div>
-      <h3>Контакты</h3>
-      <p>Телефон: +7 (900) 000-00-00</p>
-      <p>hello@example.shop</p>
-      <div class="social-row">
-        <%= link_to "VK", "https://vk.com", target: "_blank", rel: "noopener noreferrer" %>
-        <%= link_to "Telegram", "https://t.me", target: "_blank", rel: "noopener noreferrer" %>
+      <h3 class="mt-0 mb-2 text-[0.95rem] text-accent-orange">Контакты</h3>
+      <p class="my-1 text-[0.9rem]">Телефон: +7 (900) 000-00-00</p>
+      <p class="my-1 text-[0.9rem]">hello@example.shop</p>
+      <div class="flex gap-3 mt-2">
+        <%= link_to "VK", "https://vk.com", target: "_blank", rel: "noopener noreferrer", class: "text-on-dark underline" %>
+        <%= link_to "Telegram", "https://t.me", target: "_blank", rel: "noopener noreferrer", class: "text-on-dark underline" %>
       </div>
     </div>
   </div>

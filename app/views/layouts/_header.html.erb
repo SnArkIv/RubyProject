@@ -1,34 +1,49 @@
-<header class="site-header" data-controller="mobile-menu">
-  <div class="site-header__inner">
-    <button type="button" class="site-header__burger" data-action="click->mobile-menu#toggle" aria-label="Меню">☰</button>
-    <select class="region-select" name="region" aria-label="Регион">
+<header class="bg-dark text-on-dark px-4 py-3 relative" data-controller="mobile-menu">
+  <div class="max-w-[1100px] mx-auto flex items-center justify-between gap-4 flex-wrap">
+    <button type="button"
+            class="hidden max-md:block bg-transparent border border-white/35 text-on-dark px-3 py-2 rounded cursor-pointer text-base"
+            data-action="click->mobile-menu#toggle"
+            aria-label="Меню">☰</button>
+    <select class="bg-dark-deeper text-on-dark border border-white/20 px-2 py-[0.35rem] rounded text-[0.85rem]"
+            name="region"
+            aria-label="Регион">
       <option>Регион</option>
       <option>Москва</option>
       <option>СПб</option>
       <option>Другой</option>
     </select>
-    <%= link_to root_path, class: "site-logo" do %>
+    <%= link_to root_path,
+                class: "font-bold tracking-[0.04em] no-underline text-center flex-1 max-md:order-first max-md:flex-none max-md:w-full" do %>
       ЛОГОТИП МАГАЗИНА
     <% end %>
-    <div class="site-header__nav-wrap" data-mobile-menu-target="panel">
+    <div class="hidden md:flex items-center gap-4 flex-1 justify-end max-md:w-full max-md:flex-col max-md:items-stretch max-md:py-3"
+         data-mobile-menu-target="panel">
       <% if header_landing_style? %>
-        <ul class="header-links">
-          <li><%= link_to "Вход", login_path %></li>
-          <li><%= link_to "Регистрация", register_path %></li>
+        <ul class="flex items-center gap-3 list-none m-0 p-0 max-md:flex-col max-md:items-start">
+          <li><%= link_to "Вход", login_path, class: "text-on-dark no-underline hover:underline" %></li>
+          <li><%= link_to "Регистрация", register_path, class: "text-on-dark no-underline hover:underline" %></li>
         </ul>
       <% else %>
-        <ul class="header-links">
+        <ul class="flex items-center gap-3 list-none m-0 p-0 max-md:flex-col max-md:items-start">
           <li>
             <% if current_user %>
-              <%= link_to catalog_path, class: "icon-link", title: "Профиль" do %>⌂<% end %>
+              <%= link_to catalog_path,
+                          class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
+                          title: "Профиль" do %>⌂<% end %>
             <% else %>
-              <%= link_to login_path, class: "icon-link", title: "Вход" do %>⌂<% end %>
+              <%= link_to login_path,
+                          class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
+                          title: "Вход" do %>⌂<% end %>
             <% end %>
           </li>
-          <li><%= link_to catalog_path, class: "icon-link", title: "Корзина" do %>🛒<% end %></li>
-          <li><%= link_to "О нас", root_path %></li>
+          <li>
+            <%= link_to catalog_path,
+                        class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
+                        title: "Корзина" do %>🛒<% end %>
+          </li>
+          <li><%= link_to "О нас", root_path, class: "text-on-dark no-underline hover:underline" %></li>
           <% if current_user %>
-            <li><%= link_to "Выйти", logout_path, data: { turbo_method: :delete } %></li>
+            <li><%= link_to "Выйти", logout_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline" %></li>
           <% end %>
         </ul>
       <% end %>

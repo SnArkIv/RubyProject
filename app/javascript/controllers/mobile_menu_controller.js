@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ["panel"]
 
   toggle() {
-    this.panelTarget.classList.toggle("is-open")
+    this.panelTarget.classList.toggle("hidden")
+    this.panelTarget.classList.toggle("flex")
   }
 }

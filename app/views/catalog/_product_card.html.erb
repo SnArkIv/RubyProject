@@ -1,26 +1,28 @@
-<%= link_to product_path(product, **query.compact_blank.symbolize_keys), class: "product-card", data: { turbo_frame: "product_modal" } do %>
-  <div class="product-card__image-wrap">
+<%= link_to product_path(product, **query.compact_blank.symbolize_keys),
+            class: "group bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] no-underline text-inherit block relative",
+            data: { turbo_frame: "product_modal" } do %>
+  <div class="relative aspect-square bg-[#e0e0e0] overflow-hidden">
     <% if product.on_sale? %>
-      <span class="sale-badge">SALE</span>
+      <span class="absolute top-2 left-2 bg-accent text-white text-[0.7rem] font-extrabold px-1.5 py-0.5 rounded z-[2]">SALE</span>
     <% end %>
     <% if product.image.attached? %>
-      <%= active_storage_image_tag product.image, resize_to_limit: [ 400, 400 ], alt: product.name, loading: "lazy" %>
+      <%= active_storage_image_tag product.image, resize_to_limit: [ 400, 400 ], alt: product.name, loading: "lazy", class: "w-full h-full object-cover" %>
     <% else %>
-      <%= image_tag "https://placehold.co/400x400/ddd/333?text=#{CGI.escape(product.name)}", alt: product.name %>
+      <%= image_tag "https://placehold.co/400x400/ddd/333?text=#{CGI.escape(product.name)}", alt: product.name, class: "w-full h-full object-cover" %>
     <% end %>
-    <div class="product-card__sizes">
+    <div class="absolute inset-0 bg-black/65 text-white flex items-center justify-center gap-1.5 opacity-0 transition-opacity duration-200 text-[0.9rem] group-hover:opacity-100">
       <% product.sizes.each do |sz| %>
         <span><%= sz %></span>
       <% end %>
     </div>
   </div>
-  <div class="product-card__body">
-    <h2 class="product-card__title"><%= product.name %></h2>
+  <div class="p-3">
+    <h2 class="mt-0 mb-2 text-[0.95rem]"><%= product.name %></h2>
     <div>
       <% if product.on_sale? %>
-        <span class="price-old"><%= format("%.0f", product.compare_at_price) %> ₽</span>
+        <span class="line-through text-[#888] text-[0.85rem] mr-1.5"><%= format("%.0f", product.compare_at_price) %> ₽</span>
       <% end %>
-      <span class="product-card__price"><%= product.display_price %> ₽</span>
+      <span class="inline-block bg-accent text-white px-3 py-[0.35rem] rounded font-bold text-[0.95rem]"><%= product.display_price %> ₽</span>
     </div>
   </div>
 <% end %>

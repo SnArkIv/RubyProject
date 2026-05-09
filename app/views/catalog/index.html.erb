@@ -1,14 +1,17 @@
 <% content_for :title, "Каталог — Магазин" %>
 
-<h1 style="margin-top:0;">Распродажа</h1>
+<h1 class="mt-0">Распродажа</h1>
 
-<div class="catalog-toolbar">
-  <div class="filter-wrap" tabindex="0">
-    <button type="button" class="filter-btn">Фильтр</button>
-    <div class="filter-panel">
-      <%= link_to "Все категории", catalog_path(@query.except(:category)) %>
+<div class="flex flex-wrap gap-3 items-center mb-5">
+  <div class="relative group" tabindex="0">
+    <button type="button"
+            class="bg-[#e9c46a] text-[#1f1f1f] border-none px-4 py-2 rounded-md cursor-pointer font-semibold">Фильтр</button>
+    <div class="hidden group-focus-within:block absolute top-full left-0 mt-1 bg-white border border-[#ccc] rounded-md py-2 min-w-[10rem] z-20 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
+      <%= link_to "Все категории", catalog_path(@query.except(:category)),
+                  class: "block px-4 py-1.5 no-underline hover:bg-page" %>
       <% Product::CATEGORIES.each do |slug, label| %>
-        <%= link_to label, catalog_path(@query.merge(category: slug)) %>
+        <%= link_to label, catalog_path(@query.merge(category: slug)),
+                    class: "block px-4 py-1.5 no-underline hover:bg-page" %>
       <% end %>
     </div>
   </div>
@@ -24,7 +27,7 @@
             [ [ "Все", "all" ], [ "М", "male" ], [ "Ж", "female" ] ],
             @query[:gender].presence || "all"
           ),
-          class: "toolbar-select",
+          class: "px-2.5 py-1.5 rounded border border-[#999] bg-white",
           onchange: "this.form.submit()" %>
     </label>
   <% end %>
@@ -44,15 +47,16 @@
             ],
             @query[:sort]
           ),
-          class: "toolbar-select",
+          class: "px-2.5 py-1.5 rounded border border-[#999] bg-white",
           onchange: "this.form.submit()" %>
     </label>
   <% end %>
 
-  <%= link_to "Обновить ленту", catalog_path, class: "btn-primary" %>
+  <%= link_to "Обновить ленту", catalog_path,
+              class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline border-none cursor-pointer text-base font-semibold hover:brightness-105" %>
 </div>
 
-<div class="product-grid">
+<div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
   <% @products.each do |product| %>
     <%= render "catalog/product_card", product: product, query: @query %>
   <% end %>
@@ -62,8 +66,9 @@
   <p>Товаров не найдено.</p>
 <% end %>
 
-<div class="refresh-row">
-  <%= link_to "↻ Обновить ленту", catalog_path, class: "btn-primary" %>
+<div class="mt-8 text-center">
+  <%= link_to "↻ Обновить ленту", catalog_path,
+              class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline border-none cursor-pointer text-base font-semibold hover:brightness-105" %>
 </div>
 
 <%= turbo_frame_tag "product_modal" %>

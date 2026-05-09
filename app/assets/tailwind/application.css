@@ -1,0 +1,17 @@
+@import "tailwindcss";
+
+@theme {
+  --color-page: #f5f0e6;
+  --color-dark: #2d2d2d;
+  --color-dark-deeper: #1f1f1f;
+  --color-on-dark: #f5f0e6;
+  --color-accent: #e63946;
+  --color-accent-orange: #f4a261;
+  --color-text: #2d2d2d;
+  --color-cream: #faf6ed;
+}
+
+.field_with_errors :is(input, textarea) {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+}

@@ -1,15 +1,16 @@
 <% content_for :title, "О нас — Магазин" %>
 
-<section class="promo-box">
+<section class="bg-[#fff3cd] border border-[#e9c46a] px-5 py-4 rounded-lg my-4">
   <strong>Акции и предложения:</strong> скидки на распродаже, бесплатная примерка при заказе от 5000 ₽, подарочный сертификат при покупке двух вещей.
 </section>
 
-<div class="landing-hero">
-  <%= link_to "Начать покупки", catalog_path, class: "btn-primary" %>
+<div class="text-center my-8">
+  <%= link_to "Начать покупки", catalog_path,
+              class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline border-none cursor-pointer text-base font-semibold hover:brightness-105" %>
 </div>
 
-<section class="landing-section">
-  <h2>О бренде</h2>
+<section class="my-8">
+  <h2 class="mt-0">О бренде</h2>
   <p>Мы шьём одежду из натуральных тканей и следим за посадкой. Наша цель — вещи на каждый день, которые долго носятся и не устаревают за сезон.</p>
   <ul>
     <li>натуральные ткани и аккуратный крой;</li>
@@ -18,20 +19,20 @@
   </ul>
 </section>
 
-<section class="landing-section">
-  <h2>Как мы работаем</h2>
-  <div class="landing-gallery">
-    <figure>
-      <%= image_tag "https://placehold.co/400x240/2d2d2d/f5f0e6?text=Фабрика", alt: "Производство" %>
-      <figcaption>Наша фабрика — современное оборудование и проверенные поставщики полотна.</figcaption>
+<section class="my-8">
+  <h2 class="mt-0">Как мы работаем</h2>
+  <div class="grid grid-cols-[repeat(auto-fit,minmax(240px,1fr))] gap-4 mt-4">
+    <figure class="m-0 bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+      <%= image_tag "https://placehold.co/400x240/2d2d2d/f5f0e6?text=Фабрика", alt: "Производство", class: "w-full h-[180px] object-cover bg-[#ddd]" %>
+      <figcaption class="px-3 py-2 text-[0.9rem]">Наша фабрика — современное оборудование и проверенные поставщики полотна.</figcaption>
     </figure>
-    <figure>
-      <%= image_tag "https://placehold.co/400x240/2d2d2d/f5f0e6?text=Команда", alt: "Команда" %>
-      <figcaption>Наша команда — дизайнеры и технологи, которые носят то же, что и вы.</figcaption>
+    <figure class="m-0 bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+      <%= image_tag "https://placehold.co/400x240/2d2d2d/f5f0e6?text=Команда", alt: "Команда", class: "w-full h-[180px] object-cover bg-[#ddd]" %>
+      <figcaption class="px-3 py-2 text-[0.9rem]">Наша команда — дизайнеры и технологи, которые носят то же, что и вы.</figcaption>
     </figure>
   </div>
 </section>
 
-<section class="landing-section">
+<section class="my-8">
   <p>Больше фото и историй — в соцсетях внизу страницы.</p>
 </section>

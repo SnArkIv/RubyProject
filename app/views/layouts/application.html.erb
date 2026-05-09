@@ -18,19 +18,22 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%# Includes all stylesheet files in app/assets/stylesheets %>
-    <%= stylesheet_link_tag "application", "shop", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
+  <body class="min-h-screen bg-page text-text font-sans flex flex-col m-0">
     <%= render "layouts/header" %>
     <% flash.each do |type, msg| %>
-      <div class="flash">
-        <div class="flash-<%= type == "notice" ? "notice" : "alert" %>"><%= msg %></div>
+      <div class="max-w-[1100px] mx-auto px-4 py-2 w-full">
+        <% if type == "notice" %>
+          <div class="bg-[#d4edda] text-[#155724] px-4 py-3 rounded"><%= msg %></div>
+        <% else %>
+          <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded"><%= msg %></div>
+        <% end %>
       </div>
     <% end %>
-    <main class="site-main">
+    <main class="flex-1 w-full max-w-[1100px] mx-auto px-4 py-6">
       <%= yield %>
     </main>
     <%= render "layouts/footer" %>

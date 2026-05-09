@@ -1,22 +1,25 @@
 <% content_for :title, "Вход — Магазин" %>
 
-<div class="form-panel">
+<div class="max-w-[420px] mx-auto my-8 p-8 bg-cream rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
   <h1>Вход</h1>
 
   <%= form_with url: login_path do |f| %>
     <div>
-      <%= label_tag :email, "Email" %>
-      <%= email_field_tag :email, params[:email], autocomplete: "email" %>
+      <%= label_tag :email, "Email", class: "block mt-4 font-medium" %>
+      <%= email_field_tag :email, params[:email], autocomplete: "email",
+                          class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
     </div>
-    <div style="margin-top:1rem;">
-      <%= label_tag :password, "Пароль" %>
-      <%= password_field_tag :password, nil, autocomplete: "current-password" %>
+    <div class="mt-4">
+      <%= label_tag :password, "Пароль", class: "block mt-4 font-medium" %>
+      <%= password_field_tag :password, nil, autocomplete: "current-password",
+                              class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
     </div>
-    <p style="margin-top:1.25rem;">
+    <p class="mt-5">
       <%= link_to "Нет аккаунта? Регистрация", register_path %>
     </p>
-    <p style="margin-top:1rem;">
-      <%= submit_tag "Войти", class: "btn-primary", style: "width:100%;" %>
+    <p class="mt-4">
+      <%= submit_tag "Войти",
+                     class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline border-none cursor-pointer text-base font-semibold hover:brightness-105 w-full" %>
     </p>
   <% end %>
 </div>

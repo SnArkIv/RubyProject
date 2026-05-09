@@ -1,45 +1,57 @@
 <% content_for :title, "Регистрация — Магазин" %>
 
-<div class="form-panel">
+<div class="max-w-[420px] mx-auto my-8 p-8 bg-cream rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
   <h1>Регистрация</h1>
 
   <%= form_with model: @user, url: register_path do |f| %>
     <div>
-      <%= f.label :email, "Email" %>
-      <%= f.email_field :email, autocomplete: "email" %>
+      <%= f.label :email, "Email", class: "block mt-4 font-medium" %>
+      <%= f.email_field :email, autocomplete: "email",
+                        class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
       <% @user.errors.full_messages_for(:email).each do |msg| %>
-        <div class="form-error"><%= msg %></div>
+        <div class="text-accent text-[0.85rem] mt-1"><%= msg %></div>
       <% end %>
     </div>
 
     <div data-controller="password-toggle">
-      <%= f.label :password, "Пароль" %>
-      <div class="password-row">
-        <%= f.password_field :password, autocomplete: "new-password", data: { password_toggle_target: "input" } %>
-        <button type="button" class="toggle-visibility" data-action="click->password-toggle#toggle" aria-label="Показать пароль">👁</button>
+      <%= f.label :password, "Пароль", class: "block mt-4 font-medium" %>
+      <div class="relative">
+        <%= f.password_field :password, autocomplete: "new-password",
+                              data: { password_toggle_target: "input" },
+                              class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
+        <button type="button"
+                class="absolute right-1.5 top-1/2 -translate-y-1/2 mt-[0.6rem] bg-transparent border-none cursor-pointer text-base p-1"
+                data-action="click->password-toggle#toggle"
+                aria-label="Показать пароль">👁</button>
       </div>
       <% @user.errors.full_messages_for(:password).each do |msg| %>
-        <div class="form-error"><%= msg %></div>
+        <div class="text-accent text-[0.85rem] mt-1"><%= msg %></div>
       <% end %>
     </div>
 
     <div data-controller="password-toggle">
-      <%= f.label :password_confirmation, "Подтверждение пароля" %>
-      <div class="password-row">
-        <%= f.password_field :password_confirmation, autocomplete: "new-password", data: { password_toggle_target: "input" } %>
-        <button type="button" class="toggle-visibility" data-action="click->password-toggle#toggle" aria-label="Показать пароль">👁</button>
+      <%= f.label :password_confirmation, "Подтверждение пароля", class: "block mt-4 font-medium" %>
+      <div class="relative">
+        <%= f.password_field :password_confirmation, autocomplete: "new-password",
+                              data: { password_toggle_target: "input" },
+                              class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
+        <button type="button"
+                class="absolute right-1.5 top-1/2 -translate-y-1/2 mt-[0.6rem] bg-transparent border-none cursor-pointer text-base p-1"
+                data-action="click->password-toggle#toggle"
+                aria-label="Показать пароль">👁</button>
       </div>
       <% @user.errors.full_messages_for(:password_confirmation).each do |msg| %>
-        <div class="form-error"><%= msg %></div>
+        <div class="text-accent text-[0.85rem] mt-1"><%= msg %></div>
       <% end %>
     </div>
 
-    <p style="margin-top:1.25rem;">
+    <p class="mt-5">
       <%= link_to "Уже есть аккаунт? Войти", login_path %>
     </p>
 
-    <p style="margin-top:1rem;">
-      <%= f.submit "Зарегистрироваться", class: "btn-secondary", style: "width:100%;" %>
+    <p class="mt-4">
+      <%= f.submit "Зарегистрироваться",
+                   class: "inline-block bg-accent-orange text-[#1f1f1f] px-6 py-3 rounded-md no-underline border-none cursor-pointer text-base font-semibold w-full" %>
     </p>
   <% end %>
 </div>

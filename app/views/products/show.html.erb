@@ -1,34 +1,36 @@
 <%= turbo_frame_tag "product_modal" do %>
-  <div class="modal-backdrop">
-    <div class="modal-panel">
-      <%= link_to "×", catalog_path(@catalog_params), class: "modal-close", data: { turbo_frame: "product_modal" } %>
-      <div class="modal-panel__image">
+  <div class="fixed inset-0 bg-black/45 z-[100] flex items-center justify-center p-4">
+    <div class="bg-cream max-w-[720px] w-full rounded-[10px] p-5 relative grid grid-cols-2 gap-5 max-h-[90vh] overflow-y-auto max-md:grid-cols-1">
+      <%= link_to "×", catalog_path(@catalog_params),
+                  class: "absolute top-2 right-3 bg-transparent border-none text-2xl cursor-pointer leading-none z-[2]",
+                  data: { turbo_frame: "product_modal" } %>
+      <div class="bg-[#ddd] rounded-lg overflow-hidden min-h-[200px]">
         <% if @product.image.attached? %>
-          <%= active_storage_image_tag @product.image, resize_to_limit: [ 500, 500 ], alt: @product.name %>
+          <%= active_storage_image_tag @product.image, resize_to_limit: [ 500, 500 ], alt: @product.name, class: "w-full h-auto block" %>
         <% else %>
-          <%= image_tag "https://placehold.co/500x500/ddd/333?text=#{CGI.escape(@product.name)}", alt: @product.name %>
+          <%= image_tag "https://placehold.co/500x500/ddd/333?text=#{CGI.escape(@product.name)}", alt: @product.name, class: "w-full h-auto block" %>
         <% end %>
       </div>
       <div>
-        <h2 style="margin-top:0;"><%= @product.name %></h2>
+        <h2 class="mt-0"><%= @product.name %></h2>
         <p><%= simple_format(@product.description.presence || "Описание появится позже.") %></p>
-        <div class="size-buttons">
+        <div class="flex flex-wrap gap-1.5 my-3">
           <% @product.sizes.each do |sz| %>
-            <span><%= sz %></span>
+            <span class="min-w-9 px-2 py-[0.35rem] border border-[#333] bg-white rounded text-center text-[0.9rem]"><%= sz %></span>
           <% end %>
         </div>
-        <div class="modal-price-block">
+        <div class="mt-4">
           <% if @product.on_sale? %>
             <% pct = @product.discount_percent %>
             <div>
-              <span class="modal-price-big"><%= @product.display_price %> ₽</span>
+              <span class="inline-block bg-accent text-white px-[1.2rem] py-[0.6rem] rounded-md font-extrabold text-xl"><%= @product.display_price %> ₽</span>
               <% if pct.positive? %>
-                <span class="discount-tag">-<%= pct %>%</span>
+                <span class="inline-block ml-2 bg-[#1f1f1f] text-white px-1.5 py-0.5 rounded text-[0.8rem] align-middle">-<%= pct %>%</span>
               <% end %>
             </div>
-            <p style="margin:0.5rem 0 0;font-size:0.9rem;">Без скидки: <%= format("%.0f", @product.compare_at_price) %> ₽</p>
+            <p class="mt-2 mb-0 text-[0.9rem]">Без скидки: <%= format("%.0f", @product.compare_at_price) %> ₽</p>
           <% else %>
-            <span class="modal-price-big"><%= @product.display_price %> ₽</span>
+            <span class="inline-block bg-accent text-white px-[1.2rem] py-[0.6rem] rounded-md font-extrabold text-xl"><%= @product.display_price %> ₽</span>
           <% end %>
         </div>
       </div>
