@@ -1,12 +1,11 @@
 <%= link_to product_path(product, **query.compact_blank.symbolize_keys),
-            class: "group bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] no-underline text-inherit block relative",
-            data: { turbo_frame: "product_modal" } do %>
+            class: "group bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] no-underline text-inherit block relative" do %>
   <div class="relative aspect-square bg-[#e0e0e0] overflow-hidden">
     <% if product.on_sale? %>
-      <span class="absolute top-2 left-2 bg-accent text-white text-[0.7rem] font-extrabold px-1.5 py-0.5 rounded z-[2]">SALE</span>
+      <span class="absolute top-2 left-2 bg-accent text-white text-[0.7rem] font-extrabold px-1.5 py-0.5 rounded z-[2]">-<%= product.discount %>%</span>
     <% end %>
-    <% if product.image.attached? %>
-      <%= active_storage_image_tag product.image, resize_to_limit: [ 400, 400 ], alt: product.name, loading: "lazy", class: "w-full h-full object-cover" %>
+    <% if product.images.attached? %>
+      <%= active_storage_image_tag product.images.first, resize_to_limit: [ 400, 400 ], alt: product.name, loading: "lazy", class: "w-full h-full object-cover" %>
     <% else %>
       <%= image_tag "https://placehold.co/400x400/ddd/333?text=#{CGI.escape(product.name)}", alt: product.name, class: "w-full h-full object-cover" %>
     <% end %>
@@ -18,11 +17,24 @@
   </div>
   <div class="p-3">
     <h2 class="mt-0 mb-2 text-[0.95rem]"><%= product.name %></h2>
-    <div>
-      <% if product.on_sale? %>
-        <span class="line-through text-[#888] text-[0.85rem] mr-1.5"><%= format("%.0f", product.compare_at_price) %> ₽</span>
-      <% end %>
-      <span class="inline-block bg-accent text-white px-3 py-[0.35rem] rounded font-bold text-[0.95rem]"><%= product.display_price %> ₽</span>
+    <div class="flex items-center gap-1 mb-1 text-xs text-[#888]">
+      <span><%= product.category&.name %></span>
+      <span>•</span>
+      <span><%= product.brand&.name %></span>
     </div>
+    <div class="flex items-center gap-2">
+      <% if product.on_sale? %>
+        <span class="line-through text-[#888] text-[0.85rem]"><%= product.display_price %> ₽</span>
+        <span class="inline-block bg-accent text-white px-3 py-[0.35rem] rounded font-bold text-[0.95rem]"><%= product.display_final_price %> ₽</span>
+      <% else %>
+        <span class="inline-block bg-accent text-white px-3 py-[0.35rem] rounded font-bold text-[0.95rem]"><%= product.display_price %> ₽</span>
+      <% end %>
+      <% if product.average_rating.to_f > 0 %>
+        <span class="text-xs text-[#888]">★ <%= product.average_rating.round(1) %></span>
+      <% end %>
+    </div>
+    <% unless product.in_stock? %>
+      <span class="text-xs text-accent">Нет в наличии</span>
+    <% end %>
   </div>
 <% end %>

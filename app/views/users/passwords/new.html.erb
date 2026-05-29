@@ -1,0 +1,32 @@
+<% content_for :title, "Восстановление пароля — Магазин" %>
+
+<div class="max-w-[420px] mx-auto my-8 p-8 bg-cream rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+  <h1>Восстановление пароля</h1>
+
+  <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>
+    <% if resource.errors.any? %>
+      <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+        <ul class="list-disc pl-5 m-0">
+          <% resource.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= f.label :email, "Email", class: "block mt-4 font-medium" %>
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
+                        class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
+    </div>
+
+    <p class="mt-5">
+      <%= f.submit "Отправить инструкции",
+                   class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline border-none cursor-pointer text-base font-semibold hover:brightness-105 w-full" %>
+    </p>
+  <% end %>
+
+  <p class="mt-4 text-sm">
+    <%= link_to "Вернуться к входу", new_session_path(resource_name), class: "text-accent no-underline hover:underline" %>
+  </p>
+</div>

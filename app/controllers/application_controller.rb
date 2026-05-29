@@ -3,11 +3,25 @@ class ApplicationController < ActionController::Base
 
   stale_when_importmap_changes
 
-  helper_method :current_user
+  helper_method :current_cart
 
   private
 
-  def current_user
-    @current_user ||= User.find_by(id: session[:user_id])
+  def current_cart
+    return @current_cart if defined?(@current_cart)
+
+    if current_user
+      @current_cart = current_user.cart || current_user.create_cart!(session_token: SecureRandom.hex(16))
+    elsif session[:cart_token]
+      @current_cart = Cart.find_by(session_token: session[:cart_token]) || create_guest_cart
+    else
+      @current_cart = create_guest_cart
+    end
+  end
+
+  def create_guest_cart
+    cart = Cart.create!(session_token: SecureRandom.hex(16))
+    session[:cart_token] = cart.session_token
+    cart
   end
 end

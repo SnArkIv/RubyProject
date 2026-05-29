@@ -1,0 +1,60 @@
+<h1 class="mt-0">Обзор</h1>
+
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <div class="text-sm text-[#888] mb-1">Общая выручка</div>
+    <div class="text-2xl font-bold"><%= number_to_currency(@total_revenue, unit: "₽", format: "%n %u") %></div>
+  </div>
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <div class="text-sm text-[#888] mb-1">Заказов всего</div>
+    <div class="text-2xl font-bold"><%= @orders_count %></div>
+  </div>
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <div class="text-sm text-[#888] mb-1">Пользователей</div>
+    <div class="text-2xl font-bold"><%= @users_count %></div>
+  </div>
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <div class="text-sm text-[#888] mb-1">Товаров</div>
+    <div class="text-2xl font-bold"><%= @products_count %></div>
+  </div>
+</div>
+
+<div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)] mb-6">
+  <h2 class="mt-0 mb-3">Заказы по статусам</h2>
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-[#eee]">
+        <th class="p-2 font-semibold">Статус</th>
+        <th class="p-2 font-semibold">Количество</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders_by_status.each do |status, count| %>
+        <tr class="border-b border-[#eee] last:border-b-0">
+          <td class="p-2"><%= t("order.status.#{status}") %></td>
+          <td class="p-2"><%= count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>
+
+<div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+  <h2 class="mt-0 mb-3">Топ товаров по продажам</h2>
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-[#eee]">
+        <th class="p-2 font-semibold">Товар</th>
+        <th class="p-2 font-semibold">Продано</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @top_products.each do |product| %>
+        <tr class="border-b border-[#eee] last:border-b-0">
+          <td class="p-2"><%= link_to product.name, product_path(product), class: "text-accent no-underline hover:underline" %></td>
+          <td class="p-2"><%= product.sold_count %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

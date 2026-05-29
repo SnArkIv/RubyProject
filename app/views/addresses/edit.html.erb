@@ -1,0 +1,59 @@
+<% content_for :title, "Редактирование адреса — Магазин" %>
+
+<h1 class="mt-0">Редактирование адреса</h1>
+
+<div class="max-w-[640px] bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+  <%= form_with model: @address, url: address_path(@address), method: :patch, local: true do |f| %>
+    <% if @address.errors.any? %>
+      <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+        <ul class="list-disc pl-5 m-0">
+          <% @address.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <%= f.label :full_name, "ФИО", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :full_name, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+      <div>
+        <%= f.label :phone, "Телефон", class: "block text-sm font-medium mb-1" %>
+        <%= f.telephone_field :phone, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <%= f.label :city, "Город", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :city, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+      <div>
+        <%= f.label :zip_code, "Индекс", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :zip_code, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+      <div>
+        <%= f.label :street, "Улица", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :street, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+      <div>
+        <%= f.label :house, "Дом", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :house, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+    </div>
+    <div class="mb-3">
+      <%= f.label :apartment, "Квартира", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :apartment, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <label class="flex items-center gap-2 text-sm mb-3">
+      <%= f.check_box :is_default, class: "accent-accent" %>
+      По умолчанию
+    </label>
+    <div class="flex gap-3 items-center">
+      <%= f.submit "Сохранить", class: "bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+      <%= link_to "Отмена", addresses_path, class: "text-text no-underline hover:underline" %>
+    </div>
+  <% end %>
+</div>

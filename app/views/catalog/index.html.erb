@@ -1,66 +1,131 @@
 <% content_for :title, "Каталог — Магазин" %>
 
-<h1 class="mt-0">Распродажа</h1>
+<h1 class="mt-0">Каталог</h1>
 
-<div class="flex flex-wrap gap-3 items-center mb-5">
-  <div class="relative group" tabindex="0">
-    <button type="button"
-            class="bg-[#e9c46a] text-[#1f1f1f] border-none px-4 py-2 rounded-md cursor-pointer font-semibold">Фильтр</button>
-    <div class="hidden group-focus-within:block absolute top-full left-0 mt-1 bg-white border border-[#ccc] rounded-md py-2 min-w-[10rem] z-20 shadow-[0_4px_12px_rgba(0,0,0,0.12)]">
-      <%= link_to "Все категории", catalog_path(@query.except(:category)),
-                  class: "block px-4 py-1.5 no-underline hover:bg-page" %>
-      <% Product::CATEGORIES.each do |slug, label| %>
-        <%= link_to label, catalog_path(@query.merge(category: slug)),
-                    class: "block px-4 py-1.5 no-underline hover:bg-page" %>
+<div class="flex flex-col lg:flex-row gap-6">
+  <!-- Filters sidebar -->
+  <aside class="w-full lg:w-64 shrink-0">
+    <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 space-y-4">
+      <%= form_with url: catalog_path, method: :get, local: true, class: "space-y-4" do %>
+        <%= hidden_field_tag :sort, @query[:sort] if @query[:sort].present? %>
+        <%= hidden_field_tag :q, @query[:q] if @query[:q].present? %>
+
+        <div>
+          <label class="block font-medium mb-1">Поиск</label>
+          <%= text_field_tag :q, @query[:q], placeholder: "Название или артикул", class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Категория</label>
+          <div class="space-y-1 max-h-40 overflow-y-auto">
+            <% @categories.each do |cat| %>
+              <label class="flex items-center gap-2 text-sm">
+                <%= radio_button_tag :category_id, cat.id, @query[:category_id].to_s == cat.id.to_s, class: "accent-accent" %>
+                <%= cat.name %>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Бренд</label>
+          <div class="space-y-1 max-h-40 overflow-y-auto">
+            <% @brands.each do |br| %>
+              <label class="flex items-center gap-2 text-sm">
+                <%= check_box_tag "brand_id[]", br.id, Array(@query[:brand_id]).map(&:to_s).include?(br.id.to_s), class: "accent-accent" %>
+                <%= br.name %>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Размер</label>
+          <div class="flex flex-wrap gap-2">
+            <% @sizes.each do |sz| %>
+              <label class="flex items-center gap-1 text-sm border border-[#ccc] rounded px-2 py-1 cursor-pointer has-[:checked]:bg-accent has-[:checked]:text-white has-[:checked]:border-accent">
+                <%= check_box_tag "sizes[]", sz, Array(@query[:sizes]).include?(sz), class: "sr-only" %>
+                <%= sz %>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Цвет</label>
+          <div class="space-y-1 max-h-40 overflow-y-auto">
+            <% @colors.each do |col| %>
+              <label class="flex items-center gap-2 text-sm">
+                <%= check_box_tag "colors[]", col, Array(@query[:colors]).include?(col), class: "accent-accent" %>
+                <%= col %>
+              </label>
+            <% end %>
+          </div>
+        </div>
+
+        <div>
+          <label class="block font-medium mb-1">Цена</label>
+          <div class="flex items-center gap-2">
+            <%= number_field_tag :price_min, @query[:price_min], placeholder: "От", class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white" %>
+            <span>—</span>
+            <%= number_field_tag :price_max, @query[:price_max], placeholder: "До", class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white" %>
+          </div>
+        </div>
+
+        <label class="flex items-center gap-2 text-sm">
+          <%= check_box_tag :in_stock, "1", @query[:in_stock].present?, class: "accent-accent" %>
+          Только в наличии
+        </label>
+
+        <%= submit_tag "Применить", class: "w-full bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+        <%= link_to "Сбросить", catalog_path, class: "block text-center text-accent no-underline hover:underline text-sm" %>
       <% end %>
     </div>
+  </aside>
+
+  <!-- Product grid -->
+  <div class="flex-1">
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+      <p class="text-sm text-[#888] m-0">Найдено: <%= @pagy.count %> товаров</p>
+      <%= form_with url: catalog_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+        <% (@query.except(:sort)).each do |k, v| %>
+          <% if v.is_a?(Array) %>
+            <% v.each { |vv| concat hidden_field_tag "#{k}[]", vv } %>
+          <% else %>
+            <%= hidden_field_tag k, v if v.present? %>
+          <% end %>
+        <% end %>
+        <label class="text-sm">Сортировка:</label>
+        <%= select_tag :sort,
+            options_for_select(
+              [
+                [ "По новизне", "newest" ],
+                [ "Сначала дешевле", "price_asc" ],
+                [ "Сначала дороже", "price_desc" ],
+                [ "По популярности", "popularity" ],
+                [ "По скидкам", "discount" ]
+              ],
+              @query[:sort].presence || "newest"
+            ),
+            class: "px-2.5 py-1.5 rounded border border-[#999] bg-white text-sm",
+            onchange: "this.form.submit()" %>
+      <% end %>
+    </div>
+
+    <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
+      <% @products.each do |product| %>
+        <%= render "catalog/product_card", product: product, query: @query %>
+      <% end %>
+    </div>
+
+    <% if @products.empty? %>
+      <p>Товаров не найдено.</p>
+    <% end %>
+
+    <% if @pagy.pages > 1 %>
+      <div class="mt-6 flex justify-center">
+        <%== pagy_nav(@pagy) %>
+      </div>
+    <% end %>
   </div>
-
-  <%= form_with url: catalog_path, method: :get, local: true do %>
-    <% @query.except(:gender).each do |k, v| %>
-      <%= hidden_field_tag k, v if v.present? %>
-    <% end %>
-    <label>
-      Пол:
-      <%= select_tag :gender,
-          options_for_select(
-            [ [ "Все", "all" ], [ "М", "male" ], [ "Ж", "female" ] ],
-            @query[:gender].presence || "all"
-          ),
-          class: "px-2.5 py-1.5 rounded border border-[#999] bg-white",
-          onchange: "this.form.submit()" %>
-    </label>
-  <% end %>
-
-  <%= form_with url: catalog_path, method: :get, local: true do %>
-    <% @query.except(:sort).each do |k, v| %>
-      <%= hidden_field_tag k, v if v.present? %>
-    <% end %>
-    <label>
-      Сортировка:
-      <%= select_tag :sort,
-          options_for_select(
-            [
-              [ "По умолчанию", "" ],
-              [ "Сначала дешевле", "price_asc" ],
-              [ "Сначала дороже", "price_desc" ]
-            ],
-            @query[:sort]
-          ),
-          class: "px-2.5 py-1.5 rounded border border-[#999] bg-white",
-          onchange: "this.form.submit()" %>
-    </label>
-  <% end %>
 </div>
-
-<div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
-  <% @products.each do |product| %>
-    <%= render "catalog/product_card", product: product, query: @query %>
-  <% end %>
-</div>
-
-<% if @products.empty? %>
-  <p>Товаров не найдено.</p>
-<% end %>
-
-<%= turbo_frame_tag "product_modal" %>

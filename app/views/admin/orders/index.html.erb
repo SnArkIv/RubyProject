@@ -1,0 +1,46 @@
+<h1 class="mt-0">Заказы</h1>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+  <%= form_with url: admin_orders_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+    <%= select_tag :status, options_for_select([ [ "Все статусы", "" ], [ "Ожидает", "pending" ], [ "Подтверждён", "confirmed" ], [ "Отправлен", "shipped" ], [ "Доставлен", "delivered" ], [ "Отменён", "cancelled" ] ], params[:status]),
+        class: "px-2 py-1.5 rounded border border-[#999] bg-white", onchange: "this.form.submit()" %>
+  <% end %>
+</div>
+
+<div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-[#eee]">
+        <th class="p-3 font-semibold">№</th>
+        <th class="p-3 font-semibold">Пользователь</th>
+        <th class="p-3 font-semibold">Сумма</th>
+        <th class="p-3 font-semibold">Статус</th>
+        <th class="p-3 font-semibold">Дата</th>
+        <th class="p-3 font-semibold"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @orders.each do |order| %>
+        <tr class="border-b border-[#eee] last:border-b-0">
+          <td class="p-3"><%= order.id %></td>
+          <td class="p-3"><%= order.user.email %></td>
+          <td class="p-3 font-bold"><%= format("%.0f", order.total_amount) %> ₽</td>
+          <td class="p-3">
+            <%= form_with model: [:admin, order], url: admin_order_path(order), method: :patch, local: true, class: "flex items-center gap-2" do |f| %>
+              <%= f.select :status, options_for_select(
+                Order.statuses.keys.map { |s| [ t("order.status.#{s}"), s ] }, order.status
+              ), {}, class: "px-2 py-1 rounded border border-[#999] bg-white text-sm", onchange: "this.form.submit()" %>
+            <% end %>
+          </td>
+          <td class="p-3 text-sm text-[#888]"><%= l(order.created_at, format: :short) %></td>
+          <td class="p-3">
+            <%= link_to "Подробнее", admin_order_path(order), class: "text-accent no-underline hover:underline text-sm" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @pagy.pages > 1 %>
+    <div class="p-3 flex justify-center"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+</div>

@@ -1,0 +1,23 @@
+<h1 class="mt-0"><%= @category.new_record? ? "Новая категория" : "Редактировать категорию" %></h1>
+
+<div class="max-w-[480px] bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+  <%= form_with model: [:admin, @category], local: true do |f| %>
+    <% if @category.errors.any? %>
+      <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+        <ul class="list-disc pl-5 m-0">
+          <% @category.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+    <div class="mb-3">
+      <%= f.label :name, "Название", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :name, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <div class="flex gap-3 items-center">
+      <%= f.submit "Сохранить", class: "bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+      <%= link_to "Отмена", admin_categories_path, class: "text-text no-underline hover:underline" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,37 @@
+<% content_for :title, "Личный кабинет — Магазин" %>
+
+<h1 class="mt-0">Личный кабинет</h1>
+
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <h2 class="mt-0 mb-4">Данные пользователя</h2>
+    <p class="mb-2"><strong>Email:</strong> <%= @user.email %></p>
+    <p class="mb-4 text-sm text-[#888]">Зарегистрирован: <%= l(@user.created_at, format: :short) %></p>
+    <%= link_to "Редактировать профиль", edit_profile_path,
+                class: "inline-block bg-accent text-white px-4 py-2 rounded-md no-underline font-semibold hover:brightness-105" %>
+  </div>
+
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <h2 class="mt-0 mb-4">История заказов</h2>
+    <% if @orders.any? %>
+      <ul class="list-none m-0 p-0 space-y-3">
+        <% @orders.each do |order| %>
+          <li class="flex items-center justify-between border-b border-[#eee] pb-2">
+            <div>
+              <span class="font-semibold">Заказ №<%= order.id %></span>
+              <span class="text-sm text-[#888] ml-2"><%= l(order.created_at, format: :short) %></span>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-sm px-2 py-0.5 rounded bg-page"><%= t("order.status.#{order.status}") %></span>
+              <span class="font-bold"><%= format("%.0f", order.total_amount) %> ₽</span>
+              <%= link_to "Подробнее", order_path(order), class: "text-accent no-underline text-sm hover:underline" %>
+            </div>
+          </li>
+        <% end %>
+      </ul>
+      <%= link_to "Все заказы", orders_path, class: "inline-block mt-4 text-accent no-underline hover:underline" %>
+    <% else %>
+      <p class="text-[#888]">У вас пока нет заказов.</p>
+    <% end %>
+  </div>
+</div>

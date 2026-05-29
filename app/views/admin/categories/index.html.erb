@@ -1,0 +1,32 @@
+<h1 class="mt-0">Категории</h1>
+
+<div class="mb-4">
+  <%= link_to "+ Новая категория", new_admin_category_path, class: "inline-block bg-accent text-white px-4 py-2 rounded-md no-underline font-semibold hover:brightness-105" %>
+</div>
+
+<div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-[#eee]">
+        <th class="p-3 font-semibold">ID</th>
+        <th class="p-3 font-semibold">Название</th>
+        <th class="p-3 font-semibold">Товаров</th>
+        <th class="p-3 font-semibold"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @categories.each do |category| %>
+        <tr class="border-b border-[#eee] last:border-b-0">
+          <td class="p-3"><%= category.id %></td>
+          <td class="p-3"><%= category.name %></td>
+          <td class="p-3"><%= category.products.count %></td>
+          <td class="p-3">
+            <%= link_to "Редактировать", edit_admin_category_path(category), class: "text-accent no-underline hover:underline text-sm" %>
+            <%= button_to "Удалить", admin_category_path(category), method: :delete,
+                class: "text-accent bg-transparent border-none cursor-pointer hover:underline text-sm", data: { turbo_confirm: "Удалить категорию?" } %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>

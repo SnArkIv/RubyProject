@@ -1,0 +1,56 @@
+<h1 class="mt-0">Товары</h1>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+  <%= link_to "+ Новый товар", new_admin_product_path, class: "inline-block bg-accent text-white px-4 py-2 rounded-md no-underline font-semibold hover:brightness-105" %>
+  <%= form_with url: admin_products_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+    <%= text_field_tag :q, params[:q], placeholder: "Поиск", class: "px-3 py-1.5 rounded border border-[#999] bg-white" %>
+    <%= select_tag :status, options_for_select([ [ "Все статусы", "" ], [ "Черновик", "draft" ], [ "Опубликован", "published" ], [ "Архив", "archived" ] ], params[:status]), class: "px-2 py-1.5 rounded border border-[#999] bg-white" %>
+    <%= submit_tag "Найти", class: "bg-dark text-on-dark px-3 py-1.5 rounded text-sm cursor-pointer border-none" %>
+  <% end %>
+</div>
+
+<div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse">
+      <thead>
+        <tr class="border-b border-[#eee]">
+          <th class="p-3 font-semibold">ID</th>
+          <th class="p-3 font-semibold">Изображение</th>
+          <th class="p-3 font-semibold">Название</th>
+          <th class="p-3 font-semibold">SKU</th>
+          <th class="p-3 font-semibold">Цена</th>
+          <th class="p-3 font-semibold">Скидка</th>
+          <th class="p-3 font-semibold">Статус</th>
+          <th class="p-3 font-semibold">Наличие</th>
+          <th class="p-3 font-semibold"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr class="border-b border-[#eee] last:border-b-0">
+            <td class="p-3"><%= product.id %></td>
+            <td class="p-3">
+              <% if product.images.attached? %>
+                <%= active_storage_image_tag product.images.first, resize_to_limit: [48, 48], alt: product.name, class: "w-12 h-12 object-cover rounded" %>
+              <% end %>
+            </td>
+            <td class="p-3"><%= product.name %></td>
+            <td class="p-3"><%= product.sku %></td>
+            <td class="p-3"><%= product.display_price %> ₽</td>
+            <td class="p-3"><%= product.discount %>%</td>
+            <td class="p-3"><%= t("product.status.#{product.status}") %></td>
+            <td class="p-3"><%= product.in_stock? ? "Да" : "Нет" %></td>
+            <td class="p-3">
+              <%= link_to "Редактировать", edit_admin_product_path(product), class: "text-accent no-underline hover:underline text-sm" %>
+              <%= button_to "Удалить", admin_product_path(product), method: :delete,
+                  class: "text-accent bg-transparent border-none cursor-pointer hover:underline text-sm", data: { turbo_confirm: "Удалить товар?" } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <% if @pagy.pages > 1 %>
+    <div class="p-3 flex justify-center"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+</div>

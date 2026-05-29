@@ -6,3 +6,25 @@ ru:
           attributes:
             password_confirmation:
               confirmation: "Пароли не совпадают"
+  order:
+    status:
+      pending: "Ожидает подтверждения"
+      confirmed: "Подтверждён"
+      shipped: "В пути"
+      delivered: "Доставлен"
+      cancelled: "Отменён"
+  product:
+    status:
+      draft: "Черновик"
+      published: "Опубликован"
+      archived: "Архив"
+  date:
+    formats:
+      default: "%d.%m.%Y"
+      short: "%d.%m.%Y"
+      long: "%d %B %Y"
+  time:
+    formats:
+      default: "%d.%m.%Y %H:%M"
+      short: "%d.%m.%Y %H:%M"
+      long: "%d %B %Y, %H:%M"

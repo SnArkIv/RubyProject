@@ -1,0 +1,43 @@
+<h1 class="mt-0">Пользователи</h1>
+
+<div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+  <%= form_with url: admin_users_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+    <%= select_tag :role, options_for_select([ [ "Все роли", "" ], [ "Покупатель", "customer" ], [ "Менеджер", "manager" ], [ "Админ", "admin" ] ], params[:role]),
+        class: "px-2 py-1.5 rounded border border-[#999] bg-white", onchange: "this.form.submit()" %>
+  <% end %>
+</div>
+
+<div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+  <table class="w-full text-left border-collapse">
+    <thead>
+      <tr class="border-b border-[#eee]">
+        <th class="p-3 font-semibold">ID</th>
+        <th class="p-3 font-semibold">Email</th>
+        <th class="p-3 font-semibold">Роль</th>
+        <th class="p-3 font-semibold">Заказов</th>
+        <th class="p-3 font-semibold">Дата регистрации</th>
+        <th class="p-3 font-semibold"></th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @users.each do |user| %>
+        <tr class="border-b border-[#eee] last:border-b-0">
+          <td class="p-3"><%= user.id %></td>
+          <td class="p-3"><%= user.email %></td>
+          <td class="p-3"><%= t("user.role.#{user.role}") %></td>
+          <td class="p-3"><%= user.orders.count %></td>
+          <td class="p-3 text-sm text-[#888]"><%= l(user.created_at, format: :short) %></td>
+          <td class="p-3">
+            <%= link_to "Просмотр", admin_user_path(user), class: "text-accent no-underline hover:underline text-sm" %>
+            <% if current_user.admin? %>
+              <%= link_to "Редактировать", edit_admin_user_path(user), class: "text-accent no-underline hover:underline text-sm ml-2" %>
+            <% end %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @pagy.pages > 1 %>
+    <div class="p-3 flex justify-center"><%== pagy_nav(@pagy) %></div>
+  <% end %>
+</div>

@@ -1,5 +1,15 @@
 class User < ApplicationRecord
-  has_secure_password
+  devise :database_authenticatable, :registerable,
+         :recoverable, :rememberable, :validatable
+
+  enum :role, { customer: 0, manager: 1, admin: 2 }, prefix: true
+
+  has_many :orders, dependent: :destroy
+  has_one :cart, dependent: :destroy
+  has_many :reviews, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :favorite_products, through: :favorites, source: :product
+  has_many :addresses, dependent: :destroy
 
   before_validation :normalize_email
 
@@ -9,6 +19,22 @@ class User < ApplicationRecord
     message: "Введите корректный адрес почты"
   }
   validates :email, uniqueness: { case_sensitive: false, message: "Email уже зарегистрирован" }
+
+  def admin?
+    role_admin?
+  end
+
+  def manager?
+    role_manager?
+  end
+
+  def customer?
+    role_customer?
+  end
+
+  def admin_or_manager?
+    admin? || manager?
+  end
 
   private
 

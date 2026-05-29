@@ -1,0 +1,69 @@
+<% content_for :title, "Корзина — Магазин" %>
+
+<h1 class="mt-0">Корзина</h1>
+
+<% if @cart_items.any? %>
+  <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="border-b border-[#eee]">
+            <th class="p-4 font-semibold">Товар</th>
+            <th class="p-4 font-semibold">Размер</th>
+            <th class="p-4 font-semibold">Цена</th>
+            <th class="p-4 font-semibold">Количество</th>
+            <th class="p-4 font-semibold">Итого</th>
+            <th class="p-4 font-semibold"></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @cart_items.each do |item| %>
+            <tr class="border-b border-[#eee] last:border-b-0">
+              <td class="p-4">
+                <div class="flex items-center gap-3">
+                  <% if item.product.images.attached? %>
+                    <%= active_storage_image_tag item.product.images.first, resize_to_limit: [64, 64], alt: item.product.name, class: "w-16 h-16 object-cover rounded" %>
+                  <% else %>
+                    <%= image_tag "https://placehold.co/64x64/ddd/333?text=#{CGI.escape(item.product.name[0..2])}", alt: item.product.name, class: "w-16 h-16 object-cover rounded" %>
+                  <% end %>
+                  <span class="font-medium"><%= item.product.name %></span>
+                </div>
+              </td>
+              <td class="p-4"><%= item.size %></td>
+              <td class="p-4">
+                <% if item.product.on_sale? %>
+                  <span class="line-through text-[#888] text-sm"><%= item.product.display_price %> ₽</span>
+                  <span class="font-bold"><%= item.product.display_final_price %> ₽</span>
+                <% else %>
+                  <span class="font-bold"><%= item.product.display_price %> ₽</span>
+                <% end %>
+              </td>
+              <td class="p-4">
+                <%= form_with url: update_item_cart_path(item), method: :patch, local: true, class: "flex items-center gap-2" do %>
+                  <%= number_field_tag :quantity, item.quantity, min: 1, class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center" %>
+                  <%= submit_tag "Обновить", class: "bg-dark text-on-dark px-3 py-1 rounded text-sm cursor-pointer border-none hover:brightness-110" %>
+                <% end %>
+              </td>
+              <td class="p-4 font-bold"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</td>
+              <td class="p-4">
+                <%= button_to "Удалить", remove_item_cart_path(item), method: :delete,
+                    class: "bg-accent text-white px-3 py-1 rounded text-sm cursor-pointer border-none hover:brightness-110" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <div class="p-4 border-t border-[#eee] flex flex-wrap items-center justify-between gap-3">
+      <span class="text-lg font-bold">Общая сумма: <%= format("%.0f", @cart.total_amount) %> ₽</span>
+      <%= link_to "Оформить заказ", new_order_path,
+          class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline font-semibold hover:brightness-105" %>
+    </div>
+  </div>
+<% else %>
+  <div class="bg-white rounded-lg p-8 text-center shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <p class="text-[#888] mb-4">Ваша корзина пуста.</p>
+    <%= link_to "Перейти в каталог", catalog_path,
+        class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline font-semibold hover:brightness-105" %>
+  </div>
+<% end %>

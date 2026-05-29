@@ -3,29 +3,36 @@
 <div class="max-w-[420px] mx-auto my-8 p-8 bg-cream rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
   <h1>Регистрация</h1>
 
-  <%= form_with model: @user, url: register_path do |f| %>
+  <%= form_for(resource, as: resource_name, url: registration_path(resource_name)) do |f| %>
+    <% if resource.errors.any? %>
+      <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+        <ul class="list-disc pl-5 m-0">
+          <% resource.errors.full_messages.each do |msg| %>
+            <li><%= msg %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
     <div>
       <%= f.label :email, "Email", class: "block mt-4 font-medium" %>
-      <%= f.email_field :email, autocomplete: "email",
+      <%= f.email_field :email, autofocus: true, autocomplete: "email",
                         class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
-      <% @user.errors.full_messages_for(:email).each do |msg| %>
-        <div class="text-accent text-[0.85rem] mt-1"><%= msg %></div>
-      <% end %>
     </div>
 
     <div data-controller="password-toggle">
       <%= f.label :password, "Пароль", class: "block mt-4 font-medium" %>
       <div class="relative">
         <%= f.password_field :password, autocomplete: "new-password",
-                              data: { password_toggle_target: "input" },
-                              class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
+                             data: { password_toggle_target: "input" },
+                             class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
         <button type="button"
                 class="absolute right-1.5 top-1/2 -translate-y-1/2 mt-[0.6rem] bg-transparent border-none cursor-pointer text-base p-1"
                 data-action="click->password-toggle#toggle"
                 aria-label="Показать пароль">👁</button>
       </div>
-      <% @user.errors.full_messages_for(:password).each do |msg| %>
-        <div class="text-accent text-[0.85rem] mt-1"><%= msg %></div>
+      <% if @minimum_password_length %>
+        <p class="text-xs text-[#888] mt-1">Минимум <%= @minimum_password_length %> символов</p>
       <% end %>
     </div>
 
@@ -33,20 +40,17 @@
       <%= f.label :password_confirmation, "Подтверждение пароля", class: "block mt-4 font-medium" %>
       <div class="relative">
         <%= f.password_field :password_confirmation, autocomplete: "new-password",
-                              data: { password_toggle_target: "input" },
-                              class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
+                             data: { password_toggle_target: "input" },
+                             class: "w-full mt-1.5 px-2.5 py-2 border border-[#ccc] rounded" %>
         <button type="button"
                 class="absolute right-1.5 top-1/2 -translate-y-1/2 mt-[0.6rem] bg-transparent border-none cursor-pointer text-base p-1"
                 data-action="click->password-toggle#toggle"
                 aria-label="Показать пароль">👁</button>
       </div>
-      <% @user.errors.full_messages_for(:password_confirmation).each do |msg| %>
-        <div class="text-accent text-[0.85rem] mt-1"><%= msg %></div>
-      <% end %>
     </div>
 
-    <p class="mt-5">
-      <%= link_to "Уже есть аккаунт? Войти", login_path %>
+    <p class="mt-5 text-sm">
+      <%= link_to "Уже есть аккаунт? Войти", new_session_path(resource_name), class: "text-accent no-underline hover:underline" %>
     </p>
 
     <p class="mt-4">

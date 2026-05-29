@@ -20,30 +20,39 @@
          data-mobile-menu-target="panel">
       <% if header_landing_style? %>
         <ul class="flex items-center gap-3 list-none m-0 p-0 max-md:flex-col max-md:items-start">
-          <li><%= link_to "Вход", login_path, class: "text-on-dark no-underline hover:underline" %></li>
-          <li><%= link_to "Регистрация", register_path, class: "text-on-dark no-underline hover:underline" %></li>
+          <li><%= link_to "Вход", new_user_session_path, class: "text-on-dark no-underline hover:underline" %></li>
+          <li><%= link_to "Регистрация", new_user_registration_path, class: "text-on-dark no-underline hover:underline" %></li>
         </ul>
       <% else %>
         <ul class="flex items-center gap-3 list-none m-0 p-0 max-md:flex-col max-md:items-start">
           <li>
-            <% if current_user %>
-              <%= link_to catalog_path,
+            <% if user_signed_in? %>
+              <%= link_to profile_path,
                           class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
                           title: "Профиль" do %>⌂<% end %>
             <% else %>
-              <%= link_to login_path,
+              <%= link_to new_user_session_path,
                           class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
                           title: "Вход" do %>⌂<% end %>
             <% end %>
           </li>
           <li>
-            <%= link_to catalog_path,
-                        class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
-                        title: "Корзина" do %>🛒<% end %>
+            <%= link_to cart_path,
+                        class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark relative",
+                        title: "Корзина" do %>
+              🛒
+              <% count = current_cart&.items_count.to_i %>
+              <% if count > 0 %>
+                <span class="absolute -top-1 -right-1 bg-accent text-white text-[0.65rem] font-bold w-4 h-4 flex items-center justify-center rounded-full"><%= count %></span>
+              <% end %>
+            <% end %>
           </li>
           <li><%= link_to "О нас", root_path, class: "text-on-dark no-underline hover:underline" %></li>
-          <% if current_user %>
-            <li><%= link_to "Выйти", logout_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline" %></li>
+          <% if user_signed_in? %>
+            <% if current_user.admin_or_manager? %>
+              <li><%= link_to "Админка", admin_root_path, class: "text-on-dark no-underline hover:underline" %></li>
+            <% end %>
+            <li><%= link_to "Выйти", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline" %></li>
           <% end %>
         </ul>
       <% end %>

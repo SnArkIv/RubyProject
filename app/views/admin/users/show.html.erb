@@ -1,0 +1,27 @@
+<h1 class="mt-0">Пользователь <%= @user.email %></h1>
+
+<div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+  <div class="space-y-2 text-sm mb-4">
+    <p><strong>Роль:</strong> <%= t("user.role.#{@user.role}") %></p>
+    <p><strong>Email:</strong> <%= @user.email %></p>
+    <p><strong>Зарегистрирован:</strong> <%= l(@user.created_at, format: :long) %></p>
+    <p><strong>Заказов:</strong> <%= @user.orders.count %></p>
+    <p><strong>Отзывов:</strong> <%= @user.reviews.count %></p>
+  </div>
+
+  <% if @user.orders.any? %>
+    <h3 class="mt-4 mb-2">Последние заказы</h3>
+    <ul class="list-none m-0 p-0 space-y-2">
+      <% @user.orders.order(created_at: :desc).limit(5).each do |order| %>
+        <li class="border-b border-[#eee] pb-2">
+          <span class="font-medium">Заказ №<%= order.id %></span>
+          <span class="text-sm text-[#888] ml-2"><%= l(order.created_at, format: :short) %></span>
+          <span class="text-sm ml-2"><%= t("order.status.#{order.status}") %></span>
+          <span class="font-bold ml-2"><%= format("%.0f", order.total_amount) %> ₽</span>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <%= link_to "← Назад", admin_users_path, class: "inline-block mt-4 text-accent no-underline hover:underline" %>
+</div>

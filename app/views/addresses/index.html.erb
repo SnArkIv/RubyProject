@@ -1,0 +1,79 @@
+<% content_for :title, "Адреса доставки — Магазин" %>
+
+<h1 class="mt-0">Адреса доставки</h1>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <h2 class="mt-0 mb-4">Добавить адрес</h2>
+    <%= form_with model: @address, url: addresses_path, local: true do |f| %>
+      <% if @address&.errors&.any? %>
+        <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+          <ul class="list-disc pl-5 m-0">
+            <% @address.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div>
+          <%= f.label :full_name, "ФИО", class: "block text-sm font-medium mb-1" %>
+          <%= f.text_field :full_name, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+        <div>
+          <%= f.label :phone, "Телефон", class: "block text-sm font-medium mb-1" %>
+          <%= f.telephone_field :phone, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div>
+          <%= f.label :city, "Город", class: "block text-sm font-medium mb-1" %>
+          <%= f.text_field :city, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+        <div>
+          <%= f.label :zip_code, "Индекс", class: "block text-sm font-medium mb-1" %>
+          <%= f.text_field :zip_code, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div>
+          <%= f.label :street, "Улица", class: "block text-sm font-medium mb-1" %>
+          <%= f.text_field :street, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+        <div>
+          <%= f.label :house, "Дом", class: "block text-sm font-medium mb-1" %>
+          <%= f.text_field :house, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        </div>
+      </div>
+      <div class="mb-3">
+        <%= f.label :apartment, "Квартира", class: "block text-sm font-medium mb-1" %>
+        <%= f.text_field :apartment, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      </div>
+      <label class="flex items-center gap-2 text-sm mb-3">
+        <%= f.check_box :is_default, class: "accent-accent" %>
+        По умолчанию
+      </label>
+      <%= f.submit "Сохранить", class: "bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+    <% end %>
+  </div>
+
+  <div class="space-y-3">
+    <% @addresses.each do |addr| %>
+      <div class="bg-white rounded-lg p-4 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+        <div class="flex items-center justify-between mb-1">
+          <div class="font-medium"><%= addr.full_name %></div>
+          <% if addr.is_default? %>
+            <span class="text-xs bg-accent/10 text-accent px-2 py-0.5 rounded">По умолчанию</span>
+          <% end %>
+        </div>
+        <p class="text-sm text-[#888] m-0 mb-2"><%= addr.phone %></p>
+        <p class="text-sm m-0"><%= addr.city %>, <%= addr.street %> <%= addr.house %>, кв. <%= addr.apartment %>, <%= addr.zip_code %></p>
+        <div class="flex items-center gap-3 mt-3">
+          <%= link_to "Редактировать", edit_address_path(addr), class: "text-sm text-accent no-underline hover:underline" %>
+          <%= button_to "Удалить", address_path(addr), method: :delete,
+              class: "text-sm text-accent bg-transparent border-none cursor-pointer hover:underline" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

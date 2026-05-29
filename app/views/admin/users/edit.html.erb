@@ -1,0 +1,16 @@
+<h1 class="mt-0">Редактировать роль</h1>
+
+<div class="max-w-[480px] bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+  <p class="mb-3"><strong><%= @user.email %></strong></p>
+  <%= form_with model: [:admin, @user], local: true do |f| %>
+    <div class="mb-3">
+      <%= f.label :role, "Роль", class: "block text-sm font-medium mb-1" %>
+      <%= f.select :role, options_for_select([ [ "Покупатель", "customer" ], [ "Менеджер", "manager" ], [ "Админ", "admin" ] ], @user.role),
+          {}, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <div class="flex gap-3 items-center">
+      <%= f.submit "Сохранить", class: "bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+      <%= link_to "Отмена", admin_users_path, class: "text-text no-underline hover:underline" %>
+    </div>
+  <% end %>
+</div>

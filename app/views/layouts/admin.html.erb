@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for?(:title) ? yield(:title) : "Админка — Магазин" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-screen bg-page text-text font-sans flex flex-col m-0">
+    <header class="bg-dark text-on-dark px-4 py-3">
+      <div class="max-w-[1100px] mx-auto flex items-center justify-between">
+        <%= link_to "← На сайт", root_path, class: "text-on-dark no-underline hover:underline text-sm" %>
+        <span class="font-bold">Админ-панель</span>
+        <div class="flex items-center gap-3 text-sm">
+          <span><%= current_user.email %></span>
+          <%= link_to "Выйти", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline" %>
+        </div>
+      </div>
+    </header>
+
+    <div class="flex flex-col lg:flex-row max-w-[1100px] mx-auto w-full flex-1 px-4 py-6 gap-6">
+      <aside class="w-full lg:w-56 shrink-0">
+        <nav class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-3 space-y-1">
+          <%= link_to "Обзор", admin_root_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'dashboard'}" %>
+          <%= link_to "Товары", admin_products_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'products'}" %>
+          <%= link_to "Категории", admin_categories_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'categories'}" %>
+          <%= link_to "Бренды", admin_brands_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'brands'}" %>
+          <%= link_to "Заказы", admin_orders_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'orders'}" %>
+          <%= link_to "Пользователи", admin_users_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'users'}" %>
+        </nav>
+      </aside>
+
+      <main class="flex-1 min-w-0">
+        <% flash.each do |type, msg| %>
+          <div class="mb-4 px-4 py-3 rounded <%= type == 'notice' ? 'bg-[#d4edda] text-[#155724]' : 'bg-[#f8d7da] text-[#721c24]' %>"><%= msg %></div>
+        <% end %>
+        <%= yield %>
+      </main>
+    </div>
+  </body>
+</html>

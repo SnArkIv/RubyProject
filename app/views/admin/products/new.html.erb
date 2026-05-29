@@ -1,0 +1,5 @@
+<h1 class="mt-0">Новый товар</h1>
+
+<div class="max-w-[640px] bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+  <%= render "form", product: @product, url: admin_products_path, method: :post %>
+</div>
