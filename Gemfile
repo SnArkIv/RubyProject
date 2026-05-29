@@ -26,6 +26,12 @@ gem "devise", "~> 4.9"
 # Pagination
 gem "pagy", "~> 9.0"
 
+# CORS for API
+gem "rack-cors"
+
+# JWT authentication for API
+gem "jwt", "~> 2.7"
+
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem "tzinfo-data", platforms: %i[ windows jruby ]
 

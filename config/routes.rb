@@ -32,6 +32,35 @@ Rails.application.routes.draw do
   resources :favorites, only: [ :index, :create, :destroy ]
   resources :addresses, except: [ :show ]
 
+  namespace :api do
+    namespace :v1 do
+      get "catalog", to: "catalog#index"
+      resources :products, only: [ :show ]
+      resources :categories, only: [ :index ]
+      resources :brands, only: [ :index ]
+
+      post "auth/login", to: "auth#login"
+      post "auth/register", to: "auth#register"
+      get "auth/me", to: "auth#me"
+
+      resource :profile, only: [ :show, :update ]
+      resource :cart, only: [ :show ] do
+        post "items", to: "carts#add_item"
+        patch "items/:id", to: "carts#update_item"
+        delete "items/:id", to: "carts#remove_item"
+      end
+      resources :orders, only: [ :index, :show, :create ] do
+        member do
+          post :repeat
+        end
+      end
+      resources :favorites, only: [ :index, :create, :destroy ]
+      resources :addresses, except: [ :show, :new, :edit ]
+      resources :reviews, only: [ :create, :destroy ]
+      get "products/:product_id/reviews", to: "reviews#index"
+    end
+  end
+
   namespace :admin do
     root "dashboard#index"
     resources :products
