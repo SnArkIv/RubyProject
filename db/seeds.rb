@@ -245,15 +245,12 @@ ITEMS.each do |attrs|
   )
   begin
     p.images.attach(
-      io: URI.open(img),
+      io: URI.open(img, open_timeout: 5, read_timeout: 5),
       filename: "#{p.sku}.jpg"
     )
-  rescue OpenURI::HTTPError, SocketError, Errno::ECONNREFUSED, Net::OpenTimeout => e
+  rescue OpenURI::HTTPError, SocketError, Errno::ECONNREFUSED, Net::OpenTimeout, Net::ReadTimeout => e
     Rails.logger.warn "Failed to load image for #{p.name}: #{e.message}"
-    p.images.attach(
-      io: URI.open("https://placehold.co/600x600/e63946/ffffff?text=#{CGI.escape(p.name)}"),
-      filename: "#{p.sku}.jpg"
-    )
+    # Skip image attachment when network is unavailable
   end
 end
 
