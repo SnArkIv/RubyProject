@@ -1,0 +1,6 @@
+one:
+  user: one
+  session_token: abc123
+
+two:
+  session_token: def456

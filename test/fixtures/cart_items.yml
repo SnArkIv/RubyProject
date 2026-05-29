@@ -1,0 +1,11 @@
+one:
+  cart: one
+  product: one
+  quantity: 2
+  size: M
+
+two:
+  cart: two
+  product: two
+  quantity: 1
+  size: 30

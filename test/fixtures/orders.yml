@@ -1,0 +1,15 @@
+one:
+  user: one
+  status: 0
+  total_amount: 100.0
+  shipping_address: "Moscow"
+  delivery_method: courier
+  payment_method: cash
+
+two:
+  user: one
+  status: 3
+  total_amount: 400.0
+  shipping_address: "SPb"
+  delivery_method: post
+  payment_method: card_on_delivery

@@ -1,0 +1,21 @@
+one:
+  user: one
+  full_name: Ivan Ivanov
+  phone: "+79990000000"
+  city: Moscow
+  street: Lenina
+  house: "1"
+  apartment: "10"
+  zip_code: "123456"
+  is_default: true
+
+two:
+  user: one
+  full_name: Petr Petrov
+  phone: "+79990000001"
+  city: SPb
+  street: Nevsky
+  house: "2"
+  apartment:
+  zip_code: "654321"
+  is_default: false

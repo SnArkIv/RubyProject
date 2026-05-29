@@ -1,3 +1,14 @@
 one:
-  email: fixture@test.com
-  password_digest: <%= BCrypt::Password.create("password12", cost: 4) %>
+  email: customer1@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password12') %>
+  role: 0
+
+two:
+  email: admin@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password12') %>
+  role: 2
+
+manager:
+  email: manager@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password12') %>
+  role: 1

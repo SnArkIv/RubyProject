@@ -2,16 +2,24 @@ one:
   name: Fixture shirt
   description: Test
   price: 100
-  compare_at_price:
-  category: tshirt
+  sku: FIX-001
+  category: tshirts
+  brand: forestwalk
   gender: all
   sizes: [ "S", "M", "L" ]
+  status: 1
+  discount: 0
+  in_stock: true
 
 two:
   name: Fixture jeans
   description: Test
   price: 200
-  compare_at_price: 250
+  sku: FIX-002
   category: jeans
+  brand: denimpro
   gender: male
   sizes: [ "30", "32" ]
+  status: 1
+  discount: 10
+  in_stock: true

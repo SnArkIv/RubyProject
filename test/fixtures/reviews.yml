@@ -1,0 +1,11 @@
+one:
+  user: one
+  product: one
+  rating: 5
+  comment: "Great product"
+
+two:
+  user: one
+  product: two
+  rating: 3
+  comment: "Okay"
