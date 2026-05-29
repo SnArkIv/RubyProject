@@ -23,6 +23,9 @@ gem "jbuilder"
 # Flexible authentication solution for Rails
 gem "devise", "~> 4.9"
 
+# Devise i18n translations
+gem "devise-i18n"
+
 # Pagination
 gem "pagy", "~> 9.0"
 

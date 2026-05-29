@@ -1,6 +1,6 @@
 class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable
 
   enum :role, { customer: 0, manager: 1, admin: 2 }, prefix: true
 
@@ -14,11 +14,10 @@ class User < ApplicationRecord
   before_validation :normalize_email
 
   validates :email, presence: true
-  validates :email, format: {
-    with: /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/,
-    message: "Введите корректный адрес почты"
-  }
-  validates :email, uniqueness: { case_sensitive: false, message: "Email уже зарегистрирован" }
+  validates :email, format: { with: /\A[^@\s]+@[^@\s]+\.[^@\s]+\z/ }
+  validates :email, uniqueness: { case_sensitive: false }
+  validates :password, presence: true, length: { minimum: 6 }, on: :create
+  validates :password, confirmation: true, if: -> { password.present? }
 
   def admin?
     role_admin?

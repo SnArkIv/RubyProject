@@ -1,8 +1,8 @@
 class Product < ApplicationRecord
   has_many_attached :images
 
-  belongs_to :category, optional: true
-  belongs_to :brand, optional: true
+  belongs_to :category
+  belongs_to :brand
   has_many :order_items, dependent: :nullify
   has_many :cart_items, dependent: :nullify
   has_many :reviews, dependent: :destroy

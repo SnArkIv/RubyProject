@@ -1,15 +1,13 @@
 module Api
   module V1
-    class AuthController < ApplicationController
-      skip_before_action :verify_authenticity_token, only: [ :login, :register ]
-
+    class AuthController < ActionController::API
       def login
         user = User.find_by(email: params[:email].to_s.downcase.strip)
         if user&.valid_password?(params[:password])
           token = JsonWebToken.encode(user_id: user.id)
           render json: { token: token, user: user_json(user) }
         else
-          render json: { error: "Invalid email or password" }, status: :unauthorized
+          render json: { error: "Неверный email или пароль" }, status: :unauthorized
         end
       end
 
