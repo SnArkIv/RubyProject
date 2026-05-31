@@ -16,6 +16,7 @@ interface Product {
   discount: number;
   sku: string;
   in_stock: boolean;
+  stock_quantity: number;
   color: string;
   material: string;
   care_instructions: string;
@@ -96,7 +97,11 @@ export default function ProductPage() {
             <p><strong>Цвет:</strong> {product.color}</p>
             <p><strong>Материал:</strong> {product.material}</p>
             <p><strong>Уход:</strong> {product.care_instructions}</p>
-            <p><strong>Наличие:</strong> {product.in_stock ? 'В наличии' : 'Нет в наличии'}</p>
+            <p><strong>Наличие:</strong> {product.in_stock
+              ? product.stock_quantity > 0 && product.stock_quantity < 50
+                ? `В наличии — осталось ${product.stock_quantity} шт.`
+                : 'В наличии'
+              : 'Нет в наличии'}</p>
           </div>
 
           <div className="mb-4">

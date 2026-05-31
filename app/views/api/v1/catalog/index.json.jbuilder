@@ -9,6 +9,7 @@ json.products @products do |product|
   json.in_stock product.in_stock
   json.color product.color
   json.sizes product.sizes
+  json.stock_quantity product.stock_quantity
   json.image_url product.images.attached? ? url_for(product.images.first) : nil
   json.category product.category&.name
   json.brand product.brand&.name

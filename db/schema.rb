@@ -143,6 +143,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_231606) do
     t.string "sizes", default: [], null: false, array: true
     t.string "sku"
     t.integer "status", default: 0, null: false
+    t.integer "stock_quantity", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"

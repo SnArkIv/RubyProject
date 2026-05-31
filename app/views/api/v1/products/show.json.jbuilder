@@ -7,6 +7,7 @@ json.discount @product.discount
 json.sku @product.sku
 json.status @product.status
 json.in_stock @product.in_stock
+json.stock_quantity @product.stock_quantity
 json.color @product.color
 json.material @product.material
 json.sizes @product.sizes

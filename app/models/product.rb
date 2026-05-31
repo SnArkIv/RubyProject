@@ -19,6 +19,7 @@ class Product < ApplicationRecord
   validates :name, :price, :category, :brand, presence: true
   validates :sku, uniqueness: true, allow_blank: true
   validates :discount, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
+  validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
 
   scope :published, -> { where(status: :published) }
   scope :in_stock, -> { where(in_stock: true) }
@@ -82,5 +83,9 @@ class Product < ApplicationRecord
   def update_average_rating
     avg = reviews.average(:rating) || 0.0
     update_column(:average_rating, avg.round(2))
+  end
+
+  def low_stock?
+    stock_quantity > 0 && stock_quantity < 50
   end
 end

@@ -11,6 +11,7 @@ interface Product {
   price: number;
   final_price: number;
   discount: number;
+  stock_quantity: number;
   image_url: string | null;
   category: string;
   brand: string;
@@ -143,6 +144,9 @@ function CatalogContent() {
                     )}
                     {product.discount > 0 && (
                       <span className="absolute top-2 left-2 bg-accent text-white text-xs font-bold px-1.5 py-0.5 rounded">-{product.discount}%</span>
+                    )}
+                    {product.stock_quantity > 0 && product.stock_quantity < 50 && (
+                      <span className="absolute top-2 right-2 bg-orange-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">Осталось {product.stock_quantity} шт.</span>
                     )}
                   </div>
                   <div className="p-3">
