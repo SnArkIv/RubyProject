@@ -35,8 +35,8 @@
     </div>
     <% if product.low_stock? %>
       <span class="text-xs text-orange-600 font-medium">Осталось <%= product.stock_quantity %> шт.</span>
-    <% elsif !product.in_stock? %>
-      <span class="text-xs text-accent">Нет в наличии</span>
+    <% elsif !product.in_stock? || product.stock_quantity == 0 %>
+      <span class="text-xs text-accent font-semibold">Нет в наличии</span>
     <% end %>
   </div>
 <% end %>

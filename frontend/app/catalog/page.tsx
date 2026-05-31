@@ -148,6 +148,9 @@ function CatalogContent() {
                     {product.stock_quantity > 0 && product.stock_quantity < 50 && (
                       <span className="absolute top-2 right-2 bg-orange-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">Осталось {product.stock_quantity} шт.</span>
                     )}
+                    {(product.stock_quantity === 0 || !product.in_stock) && (
+                      <span className="absolute top-2 right-2 bg-red-600 text-white text-xs font-bold px-1.5 py-0.5 rounded">Нет в наличии</span>
+                    )}
                   </div>
                   <div className="p-3">
                     <h3 className="text-sm font-medium truncate">{product.name}</h3>

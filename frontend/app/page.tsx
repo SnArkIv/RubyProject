@@ -127,6 +127,9 @@ export default function HomePage() {
                     {product.stock_quantity > 0 && product.stock_quantity < 50 && (
                       <span className="absolute top-3 right-3 bg-orange-600 text-white text-xs font-bold px-2 py-1 rounded">Осталось {product.stock_quantity} шт.</span>
                     )}
+                    {(product.stock_quantity === 0 || !product.in_stock) && (
+                      <span className="absolute top-3 right-3 bg-red-600 text-white text-xs font-bold px-2 py-1 rounded">Нет в наличии</span>
+                    )}
                   </div>
                   <h3 className="text-sm font-medium text-[#1a1a1a] truncate group-hover:text-[#e63946] transition">{product.name}</h3>
                   <div className="flex items-center gap-2 mt-1">

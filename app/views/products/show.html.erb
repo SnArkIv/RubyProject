@@ -51,10 +51,10 @@
       <p><strong>Наличие:</strong>
         <% if @product.low_stock? %>
           В наличии — осталось <%= @product.stock_quantity %> шт.
-        <% elsif @product.in_stock? %>
+        <% elsif @product.in_stock? && @product.stock_quantity > 0 %>
           В наличии
         <% else %>
-          Нет в наличии
+          <span class="text-accent font-semibold">Нет в наличии</span>
         <% end %>
       </p>
     </div>
