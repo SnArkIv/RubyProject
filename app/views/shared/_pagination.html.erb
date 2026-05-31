@@ -1,0 +1,24 @@
+<% page_param = defined?(pagy) ? pagy.page : 1 %>
+<% total_pages = defined?(pagy) ? pagy.pages : 1 %>
+<% url_builder = defined?(pagy_url_for) ? ->(p) { pagy_url_for(pagy, p) } : ->(p) { "?page=#{p}" } %>
+
+<div class="flex items-center justify-center gap-1.5 mt-6">
+  <% if page_param > 1 %>
+    <a href="<%= url_builder.call(page_param - 1) %>"
+       class="px-3 py-1.5 rounded text-sm border border-gray-300 bg-white text-gray-700 no-underline hover:bg-gray-100 transition">&laquo;</a>
+  <% end %>
+
+  <% (1..total_pages).each do |p| %>
+    <% if p == page_param %>
+      <span class="px-3 py-1.5 rounded text-sm font-semibold bg-accent text-white"><%= p %></span>
+    <% else %>
+      <a href="<%= url_builder.call(p) %>"
+         class="px-3 py-1.5 rounded text-sm border border-gray-300 bg-white text-gray-700 no-underline hover:bg-gray-100 transition"><%= p %></a>
+    <% end %>
+  <% end %>
+
+  <% if page_param < total_pages %>
+    <a href="<%= url_builder.call(page_param + 1) %>"
+       class="px-3 py-1.5 rounded text-sm border border-gray-300 bg-white text-gray-700 no-underline hover:bg-gray-100 transition">&raquo;</a>
+  <% end %>
+</div>

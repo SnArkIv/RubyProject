@@ -165,12 +165,18 @@ function CatalogContent() {
             </div>
 
             {pagination.pages > 1 && (
-              <div className="flex justify-center gap-2 mt-6">
+              <div className="flex items-center justify-center gap-1.5 mt-6">
+                {pagination.page > 1 && (
+                  <Link key="prev" href={buildLink({ page: String(pagination.page - 1) })} className="px-3 py-1.5 rounded text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition">&laquo;</Link>
+                )}
                 {Array.from({ length: pagination.pages }, (_, i) => i + 1).map((p) => (
-                  <Link key={p} href={buildLink({ page: String(p) })} className={`px-3 py-1 rounded text-sm ${p === pagination.page ? 'bg-accent text-white' : 'bg-white border hover:bg-gray-50'}`}>
+                  <Link key={p} href={buildLink({ page: String(p) })} className={`px-3 py-1.5 rounded text-sm no-underline transition ${p === pagination.page ? 'bg-accent text-white font-semibold' : 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-100'}`}>
                     {p}
                   </Link>
                 ))}
+                {pagination.page < pagination.pages && (
+                  <Link key="next" href={buildLink({ page: String(pagination.page + 1) })} className="px-3 py-1.5 rounded text-sm border border-gray-300 bg-white text-gray-700 hover:bg-gray-100 transition">&raquo;</Link>
+                )}
               </div>
             )}
           </>

@@ -53,6 +53,6 @@
     </table>
   </div>
   <% if @pagy.pages > 1 %>
-    <div class="p-3 flex justify-center"><%== pagy_nav(@pagy) %></div>
+    <div class="p-3 flex justify-center"><%= render "shared/pagination", pagy: @pagy %></div>
   <% end %>
 </div>
