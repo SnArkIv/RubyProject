@@ -39,9 +39,10 @@
                 <% end %>
               </td>
               <td class="p-4">
-                <%= form_with url: update_item_cart_path(item), method: :patch, local: true, class: "flex items-center gap-2" do %>
-                  <%= number_field_tag :quantity, item.quantity, min: 1, class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center" %>
-                  <%= submit_tag "Обновить", class: "bg-dark text-on-dark px-3 py-1 rounded text-sm cursor-pointer border-none hover:brightness-110" %>
+                <%= form_with url: update_item_cart_path(item), method: :patch, local: true, class: "flex items-center gap-2", data: { controller: "auto-submit" } do %>
+                  <%= number_field_tag :quantity, item.quantity, min: 1,
+                        class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center",
+                        data: { action: "change->auto-submit#submit" } %>
                 <% end %>
               </td>
               <td class="p-4 font-bold"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</td>
