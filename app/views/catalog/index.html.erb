@@ -6,13 +6,14 @@
   <!-- Filters sidebar -->
   <aside class="w-full lg:w-64 shrink-0">
     <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 space-y-4">
-      <%= form_with url: catalog_path, method: :get, local: true, class: "space-y-4" do %>
+      <%= form_with url: catalog_path, method: :get, local: true, class: "space-y-4", data: { controller: "auto-submit" } do %>
         <%= hidden_field_tag :sort, @query[:sort] if @query[:sort].present? %>
-        <%= hidden_field_tag :q, @query[:q] if @query[:q].present? %>
 
         <div>
           <label class="block font-medium mb-1">Поиск</label>
-          <%= text_field_tag :q, @query[:q], placeholder: "Название или артикул", class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+          <%= text_field_tag :q, @query[:q], placeholder: "Название или артикул",
+                class: "w-full px-3 py-2 rounded border border-[#999] bg-white",
+                data: { action: "input->auto-submit#debounce" } %>
         </div>
 
         <div>
@@ -20,7 +21,7 @@
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @categories.each do |cat| %>
               <label class="flex items-center gap-2 text-sm">
-                <%= radio_button_tag :category_id, cat.id, @query[:category_id].to_s == cat.id.to_s, class: "accent-accent" %>
+                <%= radio_button_tag :category_id, cat.id, @query[:category_id].to_s == cat.id.to_s, class: "accent-accent", data: { action: "change->auto-submit#submit" } %>
                 <%= cat.name %>
               </label>
             <% end %>
@@ -32,7 +33,7 @@
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @brands.each do |br| %>
               <label class="flex items-center gap-2 text-sm">
-                <%= check_box_tag "brand_id[]", br.id, Array(@query[:brand_id]).map(&:to_s).include?(br.id.to_s), class: "accent-accent" %>
+                <%= check_box_tag "brand_id[]", br.id, Array(@query[:brand_id]).map(&:to_s).include?(br.id.to_s), class: "accent-accent", data: { action: "change->auto-submit#submit" } %>
                 <%= br.name %>
               </label>
             <% end %>
@@ -44,7 +45,7 @@
           <div class="flex flex-wrap gap-2">
             <% @sizes.each do |sz| %>
               <label class="flex items-center gap-1 text-sm border border-[#ccc] rounded px-2 py-1 cursor-pointer has-[:checked]:bg-accent has-[:checked]:text-white has-[:checked]:border-accent">
-                <%= check_box_tag "sizes[]", sz, Array(@query[:sizes]).include?(sz), class: "sr-only" %>
+                <%= check_box_tag "sizes[]", sz, Array(@query[:sizes]).include?(sz), class: "sr-only", data: { action: "change->auto-submit#submit" } %>
                 <%= sz %>
               </label>
             <% end %>
@@ -56,7 +57,7 @@
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @colors.each do |col| %>
               <label class="flex items-center gap-2 text-sm">
-                <%= check_box_tag "colors[]", col, Array(@query[:colors]).include?(col), class: "accent-accent" %>
+                <%= check_box_tag "colors[]", col, Array(@query[:colors]).include?(col), class: "accent-accent", data: { action: "change->auto-submit#submit" } %>
                 <%= col %>
               </label>
             <% end %>
@@ -66,18 +67,21 @@
         <div>
           <label class="block font-medium mb-1">Цена</label>
           <div class="flex items-center gap-2">
-            <%= number_field_tag :price_min, @query[:price_min], placeholder: "От", class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white" %>
+            <%= number_field_tag :price_min, @query[:price_min], placeholder: "От",
+                  class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white",
+                  data: { action: "change->auto-submit#submit" } %>
             <span>—</span>
-            <%= number_field_tag :price_max, @query[:price_max], placeholder: "До", class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white" %>
+            <%= number_field_tag :price_max, @query[:price_max], placeholder: "До",
+                  class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white",
+                  data: { action: "change->auto-submit#submit" } %>
           </div>
         </div>
 
         <label class="flex items-center gap-2 text-sm">
-          <%= check_box_tag :in_stock, "1", @query[:in_stock].present?, class: "accent-accent" %>
+          <%= check_box_tag :in_stock, "1", @query[:in_stock].present?, class: "accent-accent", data: { action: "change->auto-submit#submit" } %>
           Только в наличии
         </label>
 
-        <%= submit_tag "Применить", class: "w-full bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
         <%= link_to "Сбросить", catalog_path, class: "block text-center text-accent no-underline hover:underline text-sm" %>
       <% end %>
     </div>

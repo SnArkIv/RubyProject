@@ -49,9 +49,9 @@ module Api
       private
 
       def cart_json
-        @cart = current_cart
+        @cart.reload
         {
-          items: @cart.cart_items.map do |item|
+          items: @cart.cart_items.includes(product: { images_attachments: :blob }).map do |item|
             {
               id: item.id,
               product: {
