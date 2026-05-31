@@ -48,7 +48,7 @@ class Product < ApplicationRecord
   scope :by_popularity, -> {
     left_joins(:order_items)
       .group(:id)
-      .order("COALESCE(SUM(order_items.quantity), 0) DESC")
+      .order(Arel.sql("COALESCE(SUM(order_items.quantity), 0) DESC"))
   }
   scope :similar, ->(product) {
     where(category_id: product.category_id)
