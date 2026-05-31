@@ -86,6 +86,6 @@ class Product < ApplicationRecord
   end
 
   def low_stock?
-    stock_quantity > 0 && stock_quantity < 50
+    in_stock? && stock_quantity > 0 && stock_quantity < 50
   end
 end
