@@ -5,6 +5,11 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_cart
 
+  def pagy_url_for(pagy, page, absolute: false, html_escaped: false)
+    query_params = request.query_parameters.merge(page: page)
+    "#{request.path}?#{query_params.to_query}"
+  end
+
   private
 
   def current_cart
