@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
+import { useCart } from '@/lib/cart';
 
 interface CartItem {
   id: number;
@@ -27,6 +28,7 @@ interface CartData {
 
 export default function CartPage() {
   const [data, setData] = useState<CartData | null>(null);
+  const { refreshCart } = useCart();
 
   const loadCart = () => api.get('/cart').then(setData);
 
@@ -40,7 +42,7 @@ export default function CartPage() {
     } else {
       await api.patch(`/cart/items/${id}`, { quantity: qty });
     }
-    loadCart();
+    await Promise.all([loadCart(), refreshCart()]);
   };
 
   if (!data) return <p>Загрузка...</p>;

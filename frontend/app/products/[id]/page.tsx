@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
+import { useCart } from '@/lib/cart';
 
 interface Product {
   id: number;
@@ -30,6 +31,7 @@ interface Product {
 export default function ProductPage() {
   const params = useParams();
   const { user } = useAuth();
+  const { refreshCart } = useCart();
   const [product, setProduct] = useState<Product | null>(null);
   const [selectedSize, setSelectedSize] = useState('');
   const [rating, setRating] = useState(5);
@@ -42,6 +44,7 @@ export default function ProductPage() {
   const addToCart = async () => {
     if (!selectedSize) return alert('Выберите размер');
     await api.post('/cart/items', { product_id: product?.id, size: selectedSize });
+    await refreshCart();
     alert('Товар добавлен в корзину');
   };
 
