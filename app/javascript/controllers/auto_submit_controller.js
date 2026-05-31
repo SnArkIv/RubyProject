@@ -13,13 +13,9 @@ export default class extends Controller {
   }
 
   toggleRadio(event) {
+    event.preventDefault()
     const radio = event.currentTarget
-    if (radio.checked) {
-      radio.checked = false
-      this.submit()
-    } else {
-      radio.checked = true
-      this.submit()
-    }
+    radio.checked = !radio.checked
+    this.submit()
   }
 }
