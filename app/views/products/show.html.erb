@@ -49,12 +49,12 @@
       <p><strong>Материал:</strong> <%= @product.material %></p>
       <p><strong>Уход:</strong> <%= @product.care_instructions %></p>
       <p><strong>Наличие:</strong>
-        <% unless @product.in_stock? %>
-          Нет в наличии
-        <% elsif @product.low_stock? %>
+        <% if @product.low_stock? %>
           В наличии — осталось <%= @product.stock_quantity %> шт.
-        <% else %>
+        <% elsif @product.in_stock? %>
           В наличии
+        <% else %>
+          Нет в наличии
         <% end %>
       </p>
     </div>
