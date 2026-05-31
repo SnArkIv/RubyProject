@@ -29,7 +29,7 @@ class Product < ApplicationRecord
     where("LOWER(name) ILIKE ? OR LOWER(sku) ILIKE ?", q, q)
   }
   scope :by_category, ->(id) { id.present? ? where(category_id: id) : all }
-  scope :by_brand, ->(id) { id.present? ? where(brand_id: id) : all }
+  scope :by_brand, ->(ids) { ids.present? ? where(brand_id: ids) : all }
   scope :by_gender, ->(g) {
     if g.present? && g != "all"
       where("products.gender = ? OR products.gender = ?", g, "all")

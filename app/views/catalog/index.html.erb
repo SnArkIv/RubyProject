@@ -21,7 +21,7 @@
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @categories.each do |cat| %>
               <label class="flex items-center gap-2 text-sm">
-                <%= radio_button_tag :category_id, cat.id, @query[:category_id].to_s == cat.id.to_s, class: "accent-accent", data: { action: "change->auto-submit#submit" } %>
+                <%= radio_button_tag :category_id, cat.id, @query[:category_id].to_s == cat.id.to_s, class: "accent-accent", data: { action: "click->auto-submit#toggleRadio" } %>
                 <%= cat.name %>
               </label>
             <% end %>

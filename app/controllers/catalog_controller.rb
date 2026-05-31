@@ -40,8 +40,8 @@ class CatalogController < ApplicationController
 
   def query_params
     params.permit(
-      :q, :category_id, :brand_id, :gender, :price_min, :price_max,
-      :sort, :in_stock, sizes: [], colors: []
+      :q, :category_id, :gender, :price_min, :price_max,
+      :sort, :in_stock, brand_id: [], sizes: [], colors: []
     ).to_h.symbolize_keys
   end
 end
