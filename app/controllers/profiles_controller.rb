@@ -3,7 +3,7 @@ class ProfilesController < ApplicationController
 
   def show
     @user = current_user
-    @orders = @user.orders.order(created_at: :desc).limit(5)
+    @orders = @user.orders.includes(:order_items).order(created_at: :desc).limit(5)
   end
 
   def edit

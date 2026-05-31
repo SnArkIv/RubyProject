@@ -14,22 +14,36 @@
   <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
     <h2 class="mt-0 mb-4">История заказов</h2>
     <% if @orders.any? %>
-      <ul class="list-none m-0 p-0 space-y-3">
+      <div class="space-y-4">
         <% @orders.each do |order| %>
-          <li class="flex items-center justify-between border-b border-[#eee] pb-2">
-            <div>
-              <span class="font-semibold">Заказ №<%= order.id %></span>
-              <span class="text-sm text-[#888] ml-2"><%= l(order.created_at, format: :short) %></span>
+          <div class="border border-[#eee] rounded-lg p-4">
+            <div class="flex items-center justify-between mb-2">
+              <div>
+                <span class="font-semibold">Заказ №<%= order.id %></span>
+                <span class="text-sm text-[#888] ml-2"><%= l(order.created_at, format: :short) %></span>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="text-sm px-2 py-0.5 rounded bg-page"><%= t("order.status.#{order.status}") %></span>
+                <span class="font-bold"><%= format("%.0f", order.total_amount) %> ₽</span>
+              </div>
             </div>
-            <div class="flex items-center gap-3">
-              <span class="text-sm px-2 py-0.5 rounded bg-page"><%= t("order.status.#{order.status}") %></span>
-              <span class="font-bold"><%= format("%.0f", order.total_amount) %> ₽</span>
-              <%= link_to "Подробнее", order_path(order), class: "text-accent no-underline text-sm hover:underline" %>
+            <div class="text-sm text-[#888] space-y-1 mb-2">
+              <p class="m-0"><strong>Доставка:</strong> <%= order.delivery_method_label %> | <strong>Оплата:</strong> <%= order.payment_method_label %></p>
+              <p class="m-0"><strong>Адрес:</strong> <%= order.shipping_address %></p>
+              <% if order.order_items.any? %>
+                <p class="m-0"><strong>Товары:</strong>
+                  <% order.order_items.each_with_index do |item, idx| %>
+                    <%= item.product.name %><%= idx < order.order_items.size - 1 ? ", " : "" %>
+                  <% end %>
+                  (<%= order.order_items.sum(:quantity) %> шт.)
+                </p>
+              <% end %>
             </div>
-          </li>
+            <%= link_to "Подробнее →", order_path(order), class: "text-accent no-underline text-sm hover:underline" %>
+          </div>
         <% end %>
-      </ul>
-      <%= link_to "Все заказы", orders_path, class: "inline-block mt-4 text-accent no-underline hover:underline" %>
+      </div>
+      <%= link_to "Все заказы →", orders_path, class: "inline-block mt-4 text-accent no-underline hover:underline" %>
     <% else %>
       <p class="text-[#888]">У вас пока нет заказов.</p>
     <% end %>

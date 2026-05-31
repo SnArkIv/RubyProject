@@ -3,7 +3,7 @@ class OrdersController < ApplicationController
   before_action :ensure_cart_not_empty, only: [ :new, :create ]
 
   def index
-    @orders = current_user.orders.order(created_at: :desc)
+    @orders = current_user.orders.includes(:order_items).order(created_at: :desc)
   end
 
   def show
