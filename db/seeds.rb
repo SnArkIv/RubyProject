@@ -14,15 +14,15 @@ Favorite.destroy_all
 # Users
 admin = User.create!(
   email: "admin@example.com",
-  password: "password12",
-  password_confirmation: "password12",
+  password: "admin123",
+  password_confirmation: "admin123",
   role: :admin
 )
 
 manager = User.create!(
   email: "manager@example.com",
-  password: "password12",
-  password_confirmation: "password12",
+  password: "manager123",
+  password_confirmation: "manager123",
   role: :manager
 )
 
