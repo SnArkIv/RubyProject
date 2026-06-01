@@ -41,7 +41,11 @@ export default function NewOrderPage() {
     e.preventDefault();
     try {
       const data = await api.post('/orders', {
-        order: { shipping_address: shippingAddress, delivery_method: deliveryMethod, payment_method: paymentMethod }
+        order: {
+          shipping_address: deliveryMethod === 'pickup' ? 'Самовывоз' : shippingAddress,
+          delivery_method: deliveryMethod,
+          payment_method: paymentMethod
+        }
       });
       router.push(`/orders/${data.order.id}`);
     } catch (err: any) {
@@ -57,9 +61,11 @@ export default function NewOrderPage() {
       <div className="bg-white rounded-lg p-5 shadow">
         <h2 className="text-lg font-bold mb-4">Оформление заказа</h2>
         <form onSubmit={submit} className="space-y-4">
-          <div>
+          <div style={deliveryMethod === 'pickup' ? { display: 'none' } : {}}>
             <label className="block text-sm font-medium mb-1">Адрес доставки</label>
-            <textarea value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)} required rows={3} className="w-full px-3 py-2 border rounded" />
+            <textarea value={shippingAddress} onChange={(e) => setShippingAddress(e.target.value)}
+              required={deliveryMethod !== 'pickup'} rows={3} className="w-full px-3 py-2 border rounded"
+              placeholder={deliveryMethod === 'pickup' ? 'Адрес не требуется при самовывозе' : 'Город, улица, дом, квартира, индекс'} />
           </div>
           <div>
             <label className="block text-sm font-medium mb-1">Способ доставки</label>

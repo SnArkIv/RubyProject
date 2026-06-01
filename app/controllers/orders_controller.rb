@@ -19,6 +19,7 @@ class OrdersController < ApplicationController
   def create
     @order = current_user.orders.build(order_params)
     @order.status = :pending
+    @order.shipping_address = "Самовывоз" if @order.delivery_method == "pickup" && @order.shipping_address.blank?
     @order.total_amount = @cart_items.sum { |item| item.product.final_price * item.quantity }
 
     if @order.save

@@ -18,4 +18,14 @@ export default class extends Controller {
     radio.checked = !radio.checked
     this.submit()
   }
+
+  toggleAddress(event) {
+    const field = this.element.querySelector("#address-field")
+    if (!field) return
+    if (event.target.value === "pickup") {
+      field.style.display = "none"
+    } else {
+      field.style.display = "block"
+    }
+  }
 }

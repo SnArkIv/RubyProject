@@ -16,9 +16,13 @@ class Order < ApplicationRecord
   }.freeze
 
   validates :total_amount, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :shipping_address, presence: true
+  validates :shipping_address, presence: true, if: :address_required?
   validates :delivery_method, inclusion: { in: DELIVERY_METHODS.keys }, allow_blank: true
   validates :payment_method, inclusion: { in: PAYMENT_METHODS.keys }, allow_blank: true
+
+  def address_required?
+    delivery_method != "pickup"
+  end
 
   def delivery_method_label
     DELIVERY_METHODS[delivery_method] || delivery_method

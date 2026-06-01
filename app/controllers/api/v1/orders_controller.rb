@@ -12,6 +12,7 @@ module Api
       def create
         @order = current_user.orders.build(order_params)
         @order.status = :pending
+        @order.shipping_address = "Самовывоз" if @order.delivery_method == "pickup" && @order.shipping_address.blank?
         cart = current_cart
         cart_items = cart.cart_items.includes(:product)
 
