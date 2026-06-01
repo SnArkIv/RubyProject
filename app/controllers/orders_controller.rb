@@ -30,6 +30,8 @@ class OrdersController < ApplicationController
           quantity: item.quantity,
           price: item.product.final_price
         )
+                new_stock = [item.product.stock_quantity - item.quantity, 0].max
+        item.product.update_columns(stock_quantity: new_stock, in_stock: new_stock > 0)
       end
 
       current_cart.cart_items.destroy_all
