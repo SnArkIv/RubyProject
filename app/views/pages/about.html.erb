@@ -1,56 +1,160 @@
-<% content_for :title, "О нас — Магазин" %>
+<% content_for :title, "Модница — Одежда на каждый день" %>
 
-<!-- Hero -->
-<section class="relative bg-dark text-on-dark rounded-lg overflow-hidden mb-8">
-  <div class="p-8 md:p-16 text-center">
-    <h1 class="mt-0 text-3xl md:text-4xl font-bold mb-4">Стильная одежда на каждый день</h1>
-    <p class="text-lg text-white/80 mb-6">Качественные материалы, актуальные модели, честные цены</p>
-    <%= link_to "Смотреть каталог", catalog_path,
-        class: "inline-block bg-accent text-white px-8 py-3 rounded-md no-underline font-semibold hover:brightness-105" %>
+<!-- Hero Section -->
+<section class="relative bg-[#1a1a1a] text-white overflow-hidden">
+  <div class="absolute inset-0 opacity-20">
+    <svg class="w-full h-full" viewBox="0 0 1200 600" preserveAspectRatio="xMidYMid slice">
+      <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
+        <path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" stroke-width="0.5"/>
+      </pattern>
+      <rect width="100%" height="100%" fill="url(#grid)"/>
+    </svg>
+  </div>
+  <div class="relative max-w-6xl mx-auto px-4 py-20 md:py-28 text-center">
+    <div class="inline-flex items-center gap-2 bg-white/10 px-4 py-2 rounded-full text-sm mb-6">
+      <span class="w-2 h-2 bg-[#e63946] rounded-full animate-pulse"></span>
+      Новая коллекция уже в продаже
+    </div>
+    <h1 class="text-4xl md:text-6xl font-bold mb-6 leading-tight">
+      Одежда, которая<br>
+      <span class="text-[#e63946]">говорит за вас</span>
+    </h1>
+    <p class="text-lg md:text-xl text-white/70 mb-8 max-w-2xl mx-auto">
+      Натуральные ткани, современный крой, честные цены. 
+      Выбирайте стиль, который подчеркивает вашу индивидуальность.
+    </p>
+    <div class="flex flex-wrap items-center justify-center gap-4">
+      <%= link_to "Смотреть каталог", catalog_path,
+          class: "bg-[#e63946] text-white px-8 py-3 rounded-md font-semibold no-underline hover:brightness-110 transition" %>
+      <%= link_to "О бренде", root_path(anchor: "about"),
+          class: "border border-white/30 text-white px-8 py-3 rounded-md font-semibold no-underline hover:bg-white/10 transition" %>
+    </div>
   </div>
 </section>
 
-<!-- Popular categories -->
-<section class="mb-8">
-  <h2 class="mt-0 mb-4">Популярные категории</h2>
-  <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-    <% @categories.each do |cat| %>
-      <%= link_to catalog_path(category_id: cat.id),
-          class: "group bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] no-underline text-inherit block" do %>
-        <div class="bg-page p-6 text-center">
-          <h3 class="mt-0 text-lg group-hover:text-accent transition-colors"><%= cat.name %></h3>
-          <p class="text-sm text-[#888]"><%= cat.products.published.count %> товаров</p>
-        </div>
-      <% end %>
-    <% end %>
+<!-- Features -->
+<section class="py-16 bg-white">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="text-center">
+        <div class="w-14 h-14 bg-[#f5f5f5] rounded-xl flex items-center justify-center mx-auto mb-4 text-2xl">🌿</div>
+        <h3 class="font-bold text-lg mb-2">Натуральные ткани</h3>
+        <p class="text-gray-500 text-sm">Хлопок, лён, шёлк — только качественные материалы для вашего комфорта.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-14 h-14 bg-[#f5f5f5] rounded-xl flex items-center justify-center mx-auto mb-4 text-2xl">✂️</div>
+        <h3 class="font-bold text-lg mb-2">Идеальный крой</h3>
+        <p class="text-gray-500 text-sm">Каждая деталь продумана. Садится идеально с первой примерки.</p>
+      </div>
+      <div class="text-center">
+        <div class="w-14 h-14 bg-[#f5f5f5] rounded-xl flex items-center justify-center mx-auto mb-4 text-2xl">🚚</div>
+        <h3 class="font-bold text-lg mb-2">Быстрая доставка</h3>
+        <p class="text-gray-500 text-sm">Доставляем по всей России за 2-5 дней. Бесплатно от 5000 ₽.</p>
+      </div>
+    </div>
   </div>
 </section>
 
-<!-- Sale block -->
-<% if @sale_products.any? %>
-  <section class="mb-8">
-    <h2 class="mt-0 mb-4">Акции и скидки</h2>
-    <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
-      <% @sale_products.each do |product| %>
-        <%= render "catalog/product_card", product: product, query: {} %>
+<!-- Categories -->
+<section class="py-16 bg-[#f8f8f8]">
+  <div class="max-w-6xl mx-auto px-4">
+    <h2 class="text-2xl font-bold mb-8 text-center">Популярные категории</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <% @categories.each do |cat| %>
+        <%= link_to catalog_path(category_id: cat.id),
+            class: "group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition no-underline block aspect-[4/3]" do %>
+          <div class="absolute inset-0 bg-[#1a1a1a] group-hover:bg-[#e63946] transition-colors duration-300"></div>
+          <div class="relative h-full flex flex-col items-center justify-center text-white p-6">
+            <h3 class="text-2xl font-bold mb-2"><%= cat.name %></h3>
+            <p class="text-white/70 text-sm"><%= cat.products.published.count %> товаров</p>
+            <span class="mt-4 inline-flex items-center text-sm font-medium">
+              Смотреть 
+              <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+            </span>
+          </div>
+        <% end %>
       <% end %>
     </div>
-    <div class="mt-4 text-center">
-      <%= link_to "Все скидки", catalog_path(sort: "discount"), class: "text-accent no-underline hover:underline font-medium" %>
+  </div>
+</section>
+
+<!-- Sale Products -->
+<% if @sale_products.any? %>
+  <section class="py-16 bg-white">
+    <div class="max-w-6xl mx-auto px-4">
+      <div class="flex items-center justify-between mb-8">
+        <h2 class="text-2xl font-bold">Акции и скидки</h2>
+        <%= link_to "Все скидки →", catalog_path(sort: "discount"), class: "text-[#e63946] no-underline hover:underline font-medium" %>
+      </div>
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <% @sale_products.each do |product| %>
+          <%= link_to product_path(product), class: "group block no-underline" do %>
+            <div class="bg-[#f8f8f8] rounded-xl overflow-hidden aspect-square mb-3 relative">
+              <% if product.images.attached? %>
+                <%= active_storage_image_tag product.images.first, resize_to_limit: [400, 400], alt: product.name, class: "w-full h-full object-cover group-hover:scale-105 transition duration-300" %>
+              <% else %>
+                <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">Нет фото</div>
+              <% end %>
+              <span class="absolute top-3 left-3 bg-[#e63946] text-white text-xs font-bold px-2 py-1 rounded">-<%= product.discount %>%</span>
+            </div>
+            <h3 class="text-sm font-medium text-[#1a1a1a] truncate group-hover:text-[#e63946] transition"><%= product.name %></h3>
+            <div class="flex items-center gap-2 mt-1">
+              <span class="font-bold text-[#1a1a1a]"><%= product.display_final_price %> ₽</span>
+              <span class="text-xs text-gray-400 line-through"><%= product.display_price %> ₽</span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
     </div>
   </section>
 <% end %>
 
-<section class="bg-[#fff3cd] border border-[#e9c46a] px-5 py-4 rounded-lg my-4">
-  <strong>Акции и предложения:</strong> скидки на распродаже, бесплатная примерка при заказе от 5000 ₽, подарочный сертификат при покупке двух вещей.
+<!-- About -->
+<section id="about" class="py-16 bg-[#1a1a1a] text-white">
+  <div class="max-w-6xl mx-auto px-4">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+      <div>
+        <h2 class="text-3xl font-bold mb-4">О бренде Модница</h2>
+        <p class="text-white/70 mb-4 leading-relaxed">
+          Мы создаём одежду для тех, кто ценит качество и стиль. Каждая вещь проходит тщательный контроль: 
+          от выбора ткани до финальной примерки. Наша цель — чтобы вы чувствовали себя уверенно каждый день.
+        </p>
+        <ul class="space-y-2 text-white/70">
+          <li class="flex items-center gap-2"><span class="text-[#e63946]">✓</span> Только натуральные ткани</li>
+          <li class="flex items-center gap-2"><span class="text-[#e63946]">✓</span> Прозрачные условия возврата 14 дней</li>
+          <li class="flex items-center gap-2"><span class="text-[#e63946]">✓</span> Собственное производство в России</li>
+        </ul>
+      </div>
+      <div class="bg-[#252525] rounded-2xl p-8">
+        <div class="grid grid-cols-2 gap-6">
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[#e63946]">12K+</div>
+            <div class="text-white/60 text-sm mt-1">Довольных клиентов</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[#e63946]">500+</div>
+            <div class="text-white/60 text-sm mt-1">Моделей в каталоге</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[#e63946]">4.8</div>
+            <div class="text-white/60 text-sm mt-1">Средняя оценка</div>
+          </div>
+          <div class="text-center">
+            <div class="text-3xl font-bold text-[#e63946]">2-5</div>
+            <div class="text-white/60 text-sm mt-1">Дней доставка</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
-<section class="my-8">
-  <h2 class="mt-0">О бренде</h2>
-  <p>Мы шьём одежду из натуральных тканей и следим за посадкой. Наша цель — вещи на каждый день, которые долго носятся и не устаревают за сезон.</p>
-  <ul>
-    <li>натуральные ткани и аккуратный крой;</li>
-    <li>прозрачные условия возврата;</li>
-    <li>собственное производство и контроль качества.</li>
-  </ul>
+<!-- CTA -->
+<section class="py-16 bg-[#e63946] text-white text-center">
+  <div class="max-w-3xl mx-auto px-4">
+    <h2 class="text-3xl font-bold mb-4">Готовы обновить гардероб?</h2>
+    <p class="text-white/80 mb-8">Присоединяйтесь к тысячам довольных клиентов. Первая покупка со скидкой 10% по промокоду <strong>НАЧАЛО</strong>.</p>
+    <%= link_to "Перейти в каталог", catalog_path,
+        class: "inline-block bg-white text-[#e63946] px-8 py-3 rounded-md font-semibold no-underline hover:bg-white/90 transition" %>
+  </div>
 </section>

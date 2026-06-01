@@ -424,14 +424,13 @@ ITEMS.each do |attrs|
       in_stock: attrs[:stock_quantity] > 0
     )
   )
-  begin
+    begin
     p.images.attach(
-      io: URI.open(img, open_timeout: 5, read_timeout: 5),
+      io: URI.open(img, open_timeout: 15, read_timeout: 15),
       filename: "#{p.sku}.jpg"
     )
   rescue OpenURI::HTTPError, SocketError, Errno::ECONNREFUSED, Net::OpenTimeout, Net::ReadTimeout => e
     Rails.logger.warn "Failed to load image for #{p.name}: #{e.message}"
-    # Skip image attachment when network is unavailable
   end
 end
 

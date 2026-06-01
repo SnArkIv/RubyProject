@@ -1,61 +1,25 @@
-<header class="bg-dark text-on-dark px-4 py-3 relative" data-controller="mobile-menu">
-  <div class="max-w-[1100px] mx-auto flex items-center justify-between gap-4 flex-wrap">
-    <button type="button"
-            class="hidden max-md:block bg-transparent border border-white/35 text-on-dark px-3 py-2 rounded cursor-pointer text-base"
-            data-action="click->mobile-menu#toggle"
-            aria-label="Меню">☰</button>
-    <select class="bg-dark-deeper text-on-dark border border-white/20 px-2 py-[0.35rem] rounded text-[0.85rem]"
-            name="region"
-            aria-label="Регион">
-      <option>Регион</option>
-      <option>Москва</option>
-      <option>СПб</option>
-      <option>Другой</option>
-    </select>
-    <%= link_to root_path,
-                class: "font-bold tracking-[0.04em] no-underline text-center flex-1 max-md:order-first max-md:flex-none max-md:w-full" do %>
-      ЛОГОТИП МАГАЗИНА
-    <% end %>
-    <div class="hidden md:flex items-center gap-4 flex-1 justify-end max-md:w-full max-md:flex-col max-md:items-stretch max-md:py-3"
-         data-mobile-menu-target="panel">
-      <% if header_landing_style? %>
-        <ul class="flex items-center gap-3 list-none m-0 p-0 max-md:flex-col max-md:items-start">
-          <li><%= link_to "Вход", new_user_session_path, class: "text-on-dark no-underline hover:underline" %></li>
-          <li><%= link_to "Регистрация", new_user_registration_path, class: "text-on-dark no-underline hover:underline" %></li>
-        </ul>
+<header class="bg-[#1a1a1a] text-white px-4 py-4">
+  <div class="max-w-6xl mx-auto flex items-center justify-between">
+    <a href="/" class="flex items-center gap-2 no-underline text-white hover:opacity-90">
+      <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Модница">
+        <rect width="32" height="32" rx="8" fill="#e63946"/>
+        <path d="M16 6L10 12H13V20H10L16 26L22 20H19V12H22L16 6Z" fill="white"/>
+      </svg>
+      <span class="font-bold text-lg tracking-tight">МОДНИЦА</span>
+    </a>
+
+    <nav class="flex items-center gap-6 text-sm">
+      <a href="<%= catalog_path %>" class="text-white/80 hover:text-white no-underline transition">Каталог</a>
+      <a href="<%= cart_path %>" class="text-white/80 hover:text-white no-underline transition">Корзина</a>
+      <% if user_signed_in? %>
+        <a href="<%= profile_path %>" class="text-white/80 hover:text-white no-underline transition"><%= current_user.email %></a>
+        <% if current_user.admin_or_manager? %>
+          <a href="<%= admin_root_path %>" class="text-white/80 hover:text-white no-underline transition">Админка</a>
+        <% end %>
+        <%= link_to "Выйти", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-white/80 hover:text-white no-underline transition" %>
       <% else %>
-        <ul class="flex items-center gap-3 list-none m-0 p-0 max-md:flex-col max-md:items-start">
-          <li>
-            <% if user_signed_in? %>
-              <%= link_to profile_path,
-                          class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
-                          title: "Профиль" do %>⌂<% end %>
-            <% else %>
-              <%= link_to new_user_session_path,
-                          class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark",
-                          title: "Вход" do %>⌂<% end %>
-            <% end %>
-          </li>
-          <li>
-            <%= link_to cart_path,
-                        class: "inline-flex items-center justify-center w-9 h-9 rounded-full bg-white/10 no-underline text-[1.1rem] text-on-dark relative",
-                        title: "Корзина" do %>
-              🛒
-              <% count = current_cart&.items_count.to_i %>
-              <% if count > 0 %>
-                <span class="absolute -top-1 -right-1 bg-accent text-white text-[0.65rem] font-bold w-4 h-4 flex items-center justify-center rounded-full"><%= count %></span>
-              <% end %>
-            <% end %>
-          </li>
-          <li><%= link_to "О нас", root_path, class: "text-on-dark no-underline hover:underline" %></li>
-          <% if user_signed_in? %>
-            <% if current_user.admin_or_manager? %>
-              <li><%= link_to "Админка", admin_root_path, class: "text-on-dark no-underline hover:underline" %></li>
-            <% end %>
-            <li><%= link_to "Выйти", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline" %></li>
-          <% end %>
-        </ul>
+        <a href="<%= new_user_session_path %>" class="bg-white text-[#1a1a1a] px-4 py-2 rounded-md font-semibold text-sm no-underline hover:bg-white/90 transition">Вход</a>
       <% end %>
-    </div>
+    </nav>
   </div>
 </header>
