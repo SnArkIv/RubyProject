@@ -413,20 +413,31 @@ ITEMS = [
 ].freeze
 
 ITEMS.each do |attrs|
-  img = attrs.delete(:img)
-  category = attrs.delete(:category)
-  brand = attrs.delete(:brand)
-  p = Product.create!(
-    attrs.merge(
-      category_id: category.id,
-      brand_id: brand.id,
-      status: :published,
-      in_stock: attrs[:stock_quantity] > 0
-    )
+  Product.create!(
+    name: attrs[:name],
+    description: attrs[:description],
+    price: attrs[:price],
+    discount: attrs[:discount],
+    stock_quantity: attrs[:stock_quantity],
+    sku: attrs[:sku],
+    category_id: attrs[:category].id,
+    brand_id: attrs[:brand].id,
+    gender: attrs[:gender],
+    sizes: attrs[:sizes],
+    material: attrs[:material],
+    color: attrs[:color],
+    care_instructions: attrs[:care_instructions],
+    status: :published,
+    in_stock: attrs[:stock_quantity] > 0
   )
-    begin
+end
+
+Product.find_each do |p|
+  attrs = ITEMS.find { |i| i[:sku] == p.sku }
+  next unless attrs && attrs[:img]
+  begin
     p.images.attach(
-      io: URI.open(img, open_timeout: 15, read_timeout: 15),
+      io: URI.open(attrs[:img], open_timeout: 15, read_timeout: 15),
       filename: "#{p.sku}.jpg"
     )
   rescue OpenURI::HTTPError, SocketError, Errno::ECONNREFUSED, Net::OpenTimeout, Net::ReadTimeout => e
