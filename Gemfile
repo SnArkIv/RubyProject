@@ -78,6 +78,7 @@ group :development do
 
   # Preview mail in the browser instead of sending
   gem "letter_opener"
+  gem "letter_opener_web"
 end
 
 group :test do

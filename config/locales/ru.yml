@@ -35,9 +35,9 @@ ru:
             price:
               blank: "не может быть пустым"
             category:
-              blank: "не может быть пустым"
+              blank: "должна быть выбрана"
             brand:
-              blank: "не может быть пустым"
+              blank: "должен быть выбран"
             sku:
               taken: "уже используется"
         review:
@@ -64,7 +64,7 @@ ru:
               blank: "не может быть пустым"
               greater_than_or_equal_to: "должна быть не меньше 0"
             shipping_address:
-              blank: "не может быть пустым"
+              blank: "не может быть пустым. Укажите адрес доставки"
             delivery_method:
               inclusion: "недопустимый способ доставки"
             payment_method:
@@ -79,6 +79,40 @@ ru:
             name:
               blank: "не может быть пустым"
               taken: "уже существует"
+    models:
+      order: "Заказ"
+    attributes:
+      order:
+        shipping_address: "Адрес доставки"
+        delivery_method: "Способ доставки"
+        payment_method: "Способ оплаты"
+      product:
+        name: "Название"
+        price: "Цена"
+        category: "Категория"
+        brand: "Бренд"
+        sku: "Артикул"
+        description: "Описание"
+        color: "Цвет"
+        material: "Материал"
+        sizes: "Размеры"
+        stock_quantity: "Количество на складе"
+        discount: "Скидка"
+        gender: "Пол"
+      user:
+        email: "Email"
+        password: "Пароль"
+        first_name: "Имя"
+        last_name: "Фамилия"
+        phone: "Телефон"
+      address:
+        full_name: "ФИО"
+        phone: "Телефон"
+        city: "Город"
+        street: "Улица"
+        house: "Дом"
+        apartment: "Квартира"
+        zip_code: "Индекс"
 
   user:
     role:

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_05_29_231607) do
+ActiveRecord::Schema[8.1].define(version: 2026_06_04_000003) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -143,11 +143,24 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_231607) do
     t.string "sizes", default: [], null: false, array: true
     t.string "sku"
     t.integer "status", default: 0, null: false
+    t.jsonb "stock_by_size", default: {}
     t.integer "stock_quantity", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["brand_id"], name: "index_products_on_brand_id"
     t.index ["category_id"], name: "index_products_on_category_id"
     t.index ["sku"], name: "index_products_on_sku", unique: true
+  end
+
+  create_table "promo_codes", force: :cascade do |t|
+    t.boolean "active", default: true
+    t.string "code", null: false
+    t.datetime "created_at", null: false
+    t.integer "discount", default: 0, null: false
+    t.datetime "expires_at"
+    t.integer "max_uses"
+    t.datetime "updated_at", null: false
+    t.integer "uses_count", default: 0
+    t.index ["code"], name: "index_promo_codes_on_code", unique: true
   end
 
   create_table "reviews", force: :cascade do |t|
@@ -166,6 +179,9 @@ ActiveRecord::Schema[8.1].define(version: 2026_05_29_231607) do
     t.datetime "created_at", null: false
     t.string "email"
     t.string "encrypted_password", default: "", null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "phone"
     t.datetime "remember_created_at"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
