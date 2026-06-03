@@ -4,6 +4,7 @@ import { useEffect, useState, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { api } from '@/lib/api';
+import { useAuth } from '@/lib/auth';
 
 interface Product {
   id: number;
@@ -28,10 +29,12 @@ interface FilterData {
 
 function CatalogContent() {
   const searchParams = useSearchParams();
+  const { user } = useAuth();
   const [products, setProducts] = useState<Product[]>([]);
   const [filters, setFilters] = useState<FilterData | null>(null);
   const [pagination, setPagination] = useState({ count: 0, page: 1, pages: 1 });
   const [loading, setLoading] = useState(true);
+  const [showFilters, setShowFilters] = useState(false);
 
   const q = searchParams.get('q') || '';
   const categoryId = searchParams.get('category_id') || '';
@@ -68,7 +71,11 @@ function CatalogContent() {
 
   return (
     <div className="flex flex-col lg:flex-row gap-6">
-      <aside className="w-full lg:w-64 shrink-0">
+      <button onClick={() => setShowFilters(!showFilters)} className="lg:hidden bg-white border rounded-lg px-4 py-2 text-sm font-medium flex items-center gap-2 shadow">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="2"><path d="M2 4h12M4 8h8M6 12h4"/></svg>
+        Фильтры {showFilters ? '▲' : '▼'}
+      </button>
+      <aside className={`${showFilters ? 'block' : 'hidden'} lg:block w-full lg:w-64 shrink-0`}>
         <div className="bg-white rounded-lg shadow p-4 space-y-4">
           <div>
             <label className="block font-medium mb-1 text-sm">Поиск</label>
@@ -133,9 +140,9 @@ function CatalogContent() {
           <p>Загрузка...</p>
         ) : (
           <>
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 md:gap-4">
               {products.map((product) => (
-                <Link key={product.id} href={`/products/${product.id}`} className="bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition block">
+                <Link key={product.id} href={`/products/${product.id}`} className={`bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition block ${(!product.in_stock || product.stock_quantity <= 0) ? 'opacity-60 grayscale' : ''}`}>
                   <div className="aspect-square bg-gray-200 relative">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />

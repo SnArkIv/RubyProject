@@ -16,6 +16,7 @@ interface Product {
   price: number;
   final_price: number;
   discount: number;
+  in_stock: boolean;
   stock_quantity: number;
   image_url: string | null;
 }
@@ -90,10 +91,37 @@ export default function HomePage() {
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-2xl font-bold mb-8 text-center">Популярные категории</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {categories.map((cat) => (
+            {categories.map((cat) => {
+                const icons: Record<string, string> = {
+                  'платья': 'M12 2L8 6v4l-4 4v8h16v-8l-4-4V6l-4-4z',
+                  'рубашки': 'M6 2h12l2 6-4 4v10H8V12L4 8l2-6z',
+                  'брюки': 'M6 2h12v8l-4 12h-4L6 10V2z',
+                  'куртки': 'M4 4h16v6l-2 12H6L4 10V4z',
+                  'аксессуары': 'M12 2a4 4 0 00-4 4v2H4v12h16V8h-4V6a4 4 0 00-4-4z',
+                  'юбки': 'M8 2h8l4 8H4l4-8zM4 10h16v12H4V10z',
+                  'обувь': 'M4 12h16l-2 10H6L4 12z',
+                };
+                const iconPath = Object.entries(icons).find(([key]) =>
+                  cat.name.toLowerCase().includes(key)
+                )?.[1] || 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5';
+                return (
               <Link key={cat.id} href={`/catalog?category_id=${cat.id}`} 
-                className="group relative bg-[#1a1a1a] rounded-2xl overflow-hidden hover:bg-[#e63946] transition-colors duration-300 block aspect-[4/3]">
-                <div className="h-full flex flex-col items-center justify-center text-white p-6">
+                className="group relative rounded-2xl overflow-hidden transition-all duration-300 block aspect-[4/3] hover:scale-[1.02]"
+                style={{
+                  backgroundColor: ['#1a1a1a', '#2d1b1b', '#1b2d1b', '#1b1b2d', '#2d2d1b', '#1b2d2d'][cat.id % 6],
+                }}>
+                <div className="absolute inset-0 opacity-[0.07] flex items-center justify-center p-8">
+                  <svg viewBox="0 0 24 24" fill="white" className="w-full h-full">
+                    <path d={iconPath}/>
+                  </svg>
+                </div>
+                <div className="absolute inset-0 opacity-[0.04]">
+                  <div className="w-full h-full" style={{
+                    backgroundImage: `radial-gradient(circle at ${20 + (cat.id * 30) % 60}% ${30 + (cat.id * 20) % 50}%, white 1px, transparent 1px)`,
+                    backgroundSize: '30px 30px'
+                  }}/>
+                </div>
+                <div className="relative h-full flex flex-col items-center justify-center text-white p-6">
                   <h3 className="text-2xl font-bold mb-2">{cat.name}</h3>
                   <p className="text-white/70 text-sm">{cat.products_count} товаров</p>
                   <span className="mt-4 inline-flex items-center text-sm font-medium">
@@ -116,7 +144,7 @@ export default function HomePage() {
             </div>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {saleProducts.map((product) => (
-                <Link key={product.id} href={`/products/${product.id}`} className="group block">
+                <Link key={product.id} href={`/products/${product.id}`} className={`group block ${(!product.in_stock || product.stock_quantity === 0) ? 'opacity-50 grayscale' : ''}`}>
                   <div className="bg-gray-100 rounded-xl overflow-hidden aspect-square mb-3 relative">
                     {product.image_url ? (
                       <img src={product.image_url} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition duration-300" />

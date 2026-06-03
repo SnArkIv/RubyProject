@@ -17,16 +17,19 @@ interface Product {
   sku: string;
   in_stock: boolean;
   stock_quantity: number;
+  stock_by_size: Record<string, number>;
   color: string;
   material: string;
   care_instructions: string;
   sizes: string[];
+  gender_label: string;
   average_rating: number;
   category: string;
   brand: string;
   images: string[];
   similar_products: { id: number; name: string; final_price: number; image_url: string | null }[];
   reviews: { id: number; rating: number; comment: string; user_email: string; created_at: string }[];
+  is_favorited?: boolean;
 }
 
 export default function ProductPage() {
@@ -37,24 +40,53 @@ export default function ProductPage() {
   const [selectedSize, setSelectedSize] = useState('');
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [activeImage, setActiveImage] = useState(0);
 
   useEffect(() => {
     api.get(`/products/${params.id}`).then(setProduct);
-  }, [params.id]);
+    if (user) {
+      api.get('/favorites').then((data) => {
+        const favs: { id: number }[] = data.favorites || [];
+        setIsFavorited(favs.some((f: any) => f.id === Number(params.id) || f.product_id === Number(params.id)));
+      }).catch(() => {});
+    }
+  }, [params.id, user]);
 
   const addToCart = async () => {
     if (!selectedSize) return alert('Выберите размер');
+    if (!product?.in_stock || (product?.stock_quantity ?? 0) <= 0) return alert('Товара нет в наличии');
     await api.post('/cart/items', { product_id: product?.id, size: selectedSize });
     await refreshCart();
     alert('Товар добавлен в корзину');
   };
 
+  const toggleFavorite = async () => {
+    if (!user) return alert('Войдите, чтобы добавить в избранное');
+    try {
+      if (isFavorited) {
+        const data = await api.get('/favorites');
+        const favs: any[] = data.favorites || [];
+        const fav = favs.find((f: any) => f.id === product?.id || f.product_id === product?.id);
+        if (fav) await api.del(`/favorites/${fav.id}`);
+        setIsFavorited(false);
+      } else {
+        await api.post('/favorites', { product_id: product?.id });
+        setIsFavorited(true);
+      }
+    } catch { /* ignore */ }
+  };
+
   const submitReview = async (e: React.FormEvent) => {
     e.preventDefault();
-    await api.post(`/products/${product?.id}/reviews`, { review: { rating, comment } });
-    const updated = await api.get(`/products/${params.id}`);
-    setProduct(updated);
-    setComment('');
+    try {
+      await api.post(`/products/${product?.id}/reviews`, { review: { rating, comment } });
+      const updated = await api.get(`/products/${params.id}`);
+      setProduct(updated);
+      setComment('');
+    } catch (err: any) {
+      alert(err.message || 'Ошибка при отправке отзыва');
+    }
   };
 
   if (!product) return <p>Загрузка...</p>;
@@ -64,16 +96,18 @@ export default function ProductPage() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <div className="aspect-square bg-gray-200 rounded-lg overflow-hidden mb-3">
-            {product.images[0] ? (
-              <img src={product.images[0]} alt={product.name} className="w-full h-full object-cover" />
+            {product.images[activeImage] ? (
+              <img src={product.images[activeImage]} alt={product.name} className="w-full h-full object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-gray-400">Нет фото</div>
             )}
           </div>
           {product.images.length > 1 && (
-            <div className="flex gap-2">
+            <div className="flex gap-2 overflow-x-auto pb-1">
               {product.images.map((img, i) => (
-                <img key={i} src={img} alt="" className="w-16 h-16 object-cover rounded cursor-pointer" />
+                <button key={i} onClick={() => setActiveImage(i)} className={`w-16 h-16 shrink-0 rounded overflow-hidden border-2 ${activeImage === i ? 'border-accent' : 'border-transparent'}`}>
+                  <img src={img} alt="" className="w-full h-full object-cover" />
+                </button>
               ))}
             </div>
           )}
@@ -94,9 +128,12 @@ export default function ProductPage() {
           </div>
 
           <div className="space-y-1 text-sm text-gray-600 mb-4">
+            {product.description && <p><strong>Описание:</strong> {product.description}</p>}
             <p><strong>Цвет:</strong> {product.color}</p>
             <p><strong>Материал:</strong> {product.material}</p>
             <p><strong>Уход:</strong> {product.care_instructions}</p>
+            <p><strong>Пол:</strong> {product.gender_label}</p>
+            <p><strong>Размеры:</strong> {product.sizes.join(', ')}</p>
             <p><strong>Наличие:</strong> {product.stock_quantity > 0 && product.stock_quantity < 50
               ? `В наличии — осталось ${product.stock_quantity} шт.`
               : product.stock_quantity > 0
@@ -105,26 +142,57 @@ export default function ProductPage() {
           </div>
 
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-1">Размер</label>
+            <label className="block text-sm font-medium mb-1">Размер <span className="text-red-500">*</span></label>
             <div className="flex flex-wrap gap-2">
-              {product.sizes.map((sz) => (
-                <button
-                  key={sz}
-                  onClick={() => setSelectedSize(sz)}
-                  className={`px-3 py-1 border rounded text-sm ${selectedSize === sz ? 'bg-accent text-white border-accent' : 'bg-white border-gray-300'}`}
-                >
-                  {sz}
-                </button>
-              ))}
+              {product.sizes.map((sz) => {
+                const inStock = product.stock_by_size ? (product.stock_by_size[sz] || 0) > 0 : product.in_stock;
+                return (
+                  <button
+                    key={sz}
+                    onClick={() => inStock && setSelectedSize(sz)}
+                    disabled={!inStock}
+                    className={`px-3 py-1 border rounded text-sm transition ${selectedSize === sz ? 'bg-accent text-white border-accent' : inStock ? 'bg-white border-gray-300 hover:border-accent hover:text-accent' : 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed line-through'}`}
+                    title={inStock ? `В наличии: ${product.stock_by_size?.[sz] || '?'} шт.` : 'Нет в наличии'}
+                  >
+                    {sz}
+                  </button>
+                );
+              })}
             </div>
+            <details className="mt-2">
+              <summary className="text-xs text-gray-500 cursor-pointer hover:text-accent">Таблица размеров</summary>
+              <div className="mt-2 text-xs text-gray-600 bg-gray-50 rounded p-2">
+                <table className="w-full text-left">
+                  <thead><tr className="border-b"><th className="pr-2">Размер</th><th className="pr-2">Обхват груди</th><th className="pr-2">Обхват талии</th><th>Обхват бёдер</th></tr></thead>
+                  <tbody>
+                    <tr><td className="pr-2">XS</td><td className="pr-2">82-86</td><td className="pr-2">62-66</td><td>88-92</td></tr>
+                    <tr><td className="pr-2">S</td><td className="pr-2">86-90</td><td className="pr-2">66-70</td><td>92-96</td></tr>
+                    <tr><td className="pr-2">M</td><td className="pr-2">90-94</td><td className="pr-2">70-74</td><td>96-100</td></tr>
+                    <tr><td className="pr-2">L</td><td className="pr-2">94-100</td><td className="pr-2">74-80</td><td>100-106</td></tr>
+                    <tr><td className="pr-2">XL</td><td className="pr-2">100-106</td><td className="pr-2">80-86</td><td>106-112</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </details>
           </div>
 
-          <button
-            onClick={addToCart}
-            className="w-full bg-accent text-white py-3 rounded-md font-semibold hover:brightness-105"
-          >
-            Добавить в корзину
-          </button>
+          <div className="flex gap-2">
+            {product.in_stock && product.stock_quantity > 0 ? (
+              <button onClick={addToCart} className="flex-1 bg-accent text-white py-3 rounded-md font-semibold hover:brightness-105">
+                Добавить в корзину
+              </button>
+            ) : (
+              <button disabled className="flex-1 bg-gray-300 text-gray-500 py-3 rounded-md font-semibold cursor-not-allowed">
+                Нет в наличии
+              </button>
+            )}
+            <button
+              onClick={toggleFavorite}
+              className={`px-4 py-3 rounded-md font-semibold border transition ${isFavorited ? 'bg-red-50 border-red-300 text-red-600' : 'bg-white border-gray-300 text-gray-600 hover:border-red-300'}`}
+            >
+              {isFavorited ? '♥' : '♡'}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -148,7 +216,7 @@ export default function ProductPage() {
           <form onSubmit={submitReview} className="mt-4 bg-white rounded-lg p-4 shadow">
             <h3 className="font-semibold mb-2">Оставить отзыв</h3>
             <div className="mb-2">
-              <label className="text-sm">Оценка:</label>
+              <label className="text-sm">Оценка <span className="text-red-500">*</span>:</label>
               <select value={rating} onChange={(e) => setRating(Number(e.target.value))} className="ml-2 border rounded px-2 py-1">
                 {[1,2,3,4,5].map((r) => <option key={r} value={r}>{r}</option>)}
               </select>
@@ -161,7 +229,7 @@ export default function ProductPage() {
 
       {product.similar_products.length > 0 && (
         <div>
-          <h2 className="text-xl font-bold mb-4">Похожие товары</h2>
+          <h2 className="text-xl font-bold mb-4">Может быть интересно</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             {product.similar_products.map((p) => (
               <Link key={p.id} href={`/products/${p.id}`} className="bg-white rounded-lg overflow-hidden shadow hover:shadow-md transition block">
