@@ -15,6 +15,10 @@ module Api
 
         return render json: { error: "Выберите размер" }, status: :unprocessable_entity if size.blank?
 
+        unless product.in_stock && product.stock_quantity > 0
+          return render json: { error: "Товара нет в наличии" }, status: :unprocessable_entity
+        end
+
         cart_item = @cart.cart_items.find_by(product_id: product.id, size: size)
         if cart_item
           cart_item.update!(quantity: cart_item.quantity + 1)
@@ -57,7 +61,10 @@ module Api
               product: {
                 id: item.product.id,
                 name: item.product.name,
+                price: item.product.price,
                 final_price: item.product.final_price,
+                in_stock: item.product.in_stock,
+                stock_quantity: item.product.stock_quantity,
                 image_url: item.product.images.attached? ? url_for(item.product.images.first) : nil
               },
               size: item.size,

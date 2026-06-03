@@ -3,6 +3,14 @@ class ReviewsController < ApplicationController
 
   def create
     @product = Product.find(params[:product_id])
+
+    unless current_user.orders.joins(:order_items)
+                          .where(order_items: { product_id: @product.id }, status: :delivered)
+                          .exists?
+      redirect_to product_path(@product), alert: "Вы можете оставить отзыв только на полученные товары"
+      return
+    end
+
     @review = current_user.reviews.build(review_params.merge(product: @product))
 
     if @review.save

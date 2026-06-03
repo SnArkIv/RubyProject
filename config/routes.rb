@@ -1,6 +1,10 @@
 Rails.application.routes.draw do
   get "up" => "rails/health#show", as: :rails_health_check
 
+  if Rails.env.development?
+    mount LetterOpenerWeb::Engine, at: "/letter_opener"
+  end
+
   root "pages#about"
 
   get "catalog", to: "catalog#index", as: :catalog
@@ -58,6 +62,7 @@ Rails.application.routes.draw do
       resources :addresses, except: [ :show, :new, :edit ]
       resources :reviews, only: [ :create, :destroy ]
       get "products/:product_id/reviews", to: "reviews#index"
+      post "promo_codes/validate", to: "promo_codes#validate"
     end
   end
 
@@ -68,5 +73,6 @@ Rails.application.routes.draw do
     resources :brands
     resources :orders, only: [ :index, :show, :update ]
     resources :users, only: [ :index, :show, :edit, :update ]
+    resources :promo_codes
   end
 end

@@ -10,6 +10,7 @@
 
     <nav class="flex items-center gap-6 text-sm">
       <a href="<%= catalog_path %>" class="text-white/80 hover:text-white no-underline transition">Каталог</a>
+      <a href="<%= favorites_path %>" class="text-white/80 hover:text-white no-underline transition">Избранное</a>
       <a href="<%= cart_path %>" class="text-white/80 hover:text-white no-underline transition">Корзина</a>
       <% if user_signed_in? %>
         <a href="<%= profile_path %>" class="text-white/80 hover:text-white no-underline transition"><%= current_user.email %></a>

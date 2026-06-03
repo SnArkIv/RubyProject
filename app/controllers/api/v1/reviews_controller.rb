@@ -10,6 +10,14 @@ module Api
 
       def create
         product = Product.find(params[:product_id])
+
+        unless current_user.orders.joins(:order_items)
+                              .where(order_items: { product_id: product.id }, status: :delivered)
+                              .exists?
+          render json: { error: "Вы можете оставить отзыв только на полученные товары" }, status: :forbidden
+          return
+        end
+
         @review = current_user.reviews.build(review_params.merge(product: product))
 
         if @review.save

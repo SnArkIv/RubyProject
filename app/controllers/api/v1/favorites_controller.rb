@@ -14,7 +14,7 @@ module Api
       end
 
       def destroy
-        favorite = current_user.favorites.find(params[:id])
+        favorite = current_user.favorites.find_by(product_id: params[:id]) || current_user.favorites.find(params[:id])
         favorite.destroy
         render json: { message: "Удалено из избранного" }
       end

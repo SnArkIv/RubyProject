@@ -13,7 +13,9 @@ json.material @product.material
 json.sizes @product.sizes
 json.care_instructions @product.care_instructions
 json.gender @product.gender
+json.gender_label @product.gender_label
 json.average_rating @product.average_rating
+json.stock_by_size @product.stock_by_size
 json.category @product.category&.name
 json.brand @product.brand&.name
 json.images @product.images.map { |img| url_for(img) }

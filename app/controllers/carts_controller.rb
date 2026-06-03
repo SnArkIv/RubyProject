@@ -14,6 +14,11 @@ class CartsController < ApplicationController
       return
     end
 
+    unless product.in_stock && product.stock_quantity > 0
+      redirect_back fallback_location: catalog_path, alert: "Товара нет в наличии"
+      return
+    end
+
     cart_item = @cart.cart_items.find_by(product_id: product.id, size: size)
 
     if cart_item

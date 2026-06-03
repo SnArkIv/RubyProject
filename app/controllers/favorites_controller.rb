@@ -14,7 +14,7 @@ class FavoritesController < ApplicationController
   end
 
   def destroy
-    @favorite = current_user.favorites.find(params[:id])
+    @favorite = current_user.favorites.find_by(product_id: params[:id]) || current_user.favorites.find(params[:id])
     @favorite.destroy
     redirect_back fallback_location: catalog_path, notice: "Удалено из избранного"
   end

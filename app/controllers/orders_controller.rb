@@ -17,12 +17,23 @@ class OrdersController < ApplicationController
   end
 
   def create
-    @order = current_user.orders.build(order_params)
+    @order = current_user.orders.build(order_params.except(:promo_code))
     @order.status = :pending
     @order.shipping_address = "Самовывоз" if @order.delivery_method == "pickup" && @order.shipping_address.blank?
-    @order.total_amount = @cart_items.sum { |item| item.product.final_price * item.quantity }
+
+    @cart_items.each do |item|
+      unless item.product.in_stock && item.product.stock_quantity >= item.quantity
+        redirect_to cart_path, alert: "Товар «#{item.product.name}» больше нет в наличии в нужном количестве"
+        return
+      end
+    end
+
+    base_amount = @cart_items.sum { |item| item.product.final_price * item.quantity }
+    @promo_code_record = find_promo(order_params[:promo_code])
+    @order.total_amount = apply_promo(base_amount, @promo_code_record)
 
     if @order.save
+      @promo_code_record&.use!
       @cart_items.each do |item|
         @order.order_items.create!(
           product: item.product,
@@ -72,6 +83,16 @@ class OrdersController < ApplicationController
   end
 
   def order_params
-    params.require(:order).permit(:shipping_address, :delivery_method, :payment_method)
+    params.require(:order).permit(:shipping_address, :delivery_method, :payment_method, :promo_code)
+  end
+
+  def find_promo(code)
+    return nil if code.blank?
+    PromoCode.active.find_by(code: code)
+  end
+
+  def apply_promo(amount, promo)
+    return amount if promo.nil? || !promo.valid_for_use?
+    amount * (1 - promo.discount / 100.0)
   end
 end

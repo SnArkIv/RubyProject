@@ -1,0 +1,38 @@
+<%= form_with model: [:admin, promo_code], local: true do |f| %>
+  <% if promo_code.errors.any? %>
+    <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+      <ul class="list-disc pl-5 m-0">
+        <% promo_code.errors.full_messages.each do |msg| %>
+          <li><%= msg %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-3 max-w-[480px]">
+    <div>
+      <%= f.label :code, "Код", class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :code, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <div>
+      <%= f.label :discount, "Скидка %", class: "block text-sm font-medium mb-1" %>
+      <%= f.number_field :discount, min: 1, max: 100, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <div>
+      <%= f.label :max_uses, "Максимум использований (оставьте пустым для безлимита)", class: "block text-sm font-medium mb-1" %>
+      <%= f.number_field :max_uses, min: 1, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <div>
+      <%= f.label :expires_at, "Действует до", class: "block text-sm font-medium mb-1" %>
+      <%= f.datetime_field :expires_at, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+    </div>
+    <label class="flex items-center gap-2 text-sm">
+      <%= f.check_box :active, class: "accent-accent" %>
+      Активен
+    </label>
+    <div class="flex gap-3 items-center pt-2">
+      <%= f.submit "Сохранить", class: "bg-accent text-white px-4 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+      <%= link_to "Отмена", admin_promo_codes_path, class: "text-text no-underline hover:underline" %>
+    </div>
+  </div>
+<% end %>
