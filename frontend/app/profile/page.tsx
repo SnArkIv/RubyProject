@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 import { useAuth } from '@/lib/auth';
@@ -31,10 +31,60 @@ interface Order {
 export default function ProfilePage() {
   const { user } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
+  const [unreviewed, setUnreviewed] = useState<{ product_id: number; name: string; image_url: string | null }[]>([]);
+  const [profile, setProfile] = useState<any>(null);
+  const [defaultAddress, setDefaultAddress] = useState<any>(null);
+
+  const fetchUnreviewed = useCallback(async () => {
+    try {
+      const data = await api.get('/orders');
+      const delivered = (data.orders || []).filter((o: Order) => o.status === 'delivered');
+      const reviewsData = await api.get('/profile');
+      const reviewedProductIds: number[] = [];
+
+      for (const order of delivered) {
+        for (const item of order.order_items) {
+          reviewedProductIds.push(item.product.id);
+        }
+      }
+
+      const allReviewed = await Promise.all(
+        delivered.flatMap(o => o.order_items.map(async (item) => {
+          try {
+            await api.get(`/products/${item.product.id}/reviews`);
+          } catch { /* no reviews */ }
+        }))
+      );
+
+      const unreviewedItems = delivered.flatMap(o =>
+        o.order_items.filter(item => {
+          return true;
+        })
+      );
+
+      const unique = new Map();
+      for (const order of delivered) {
+        for (const item of order.order_items) {
+          if (!unique.has(item.product.id)) {
+            unique.set(item.product.id, { product_id: item.product.id, name: item.product.name, image_url: item.product.image_url });
+          }
+        }
+      }
+      setUnreviewed(Array.from(unique.values()));
+    } catch { /* ignore */ }
+  }, []);
 
   useEffect(() => {
     api.get('/orders').then((data) => setOrders(data.orders));
-  }, []);
+    api.get('/profile').then((data) => {
+      setProfile(data.user);
+    }).catch(() => {});
+    api.get('/addresses').then((data) => {
+      const def = (data.addresses || []).find((a: any) => a.is_default);
+      setDefaultAddress(def || null);
+    }).catch(() => {});
+    fetchUnreviewed();
+  }, [fetchUnreviewed]);
 
   if (!user) return <p>Загрузка...</p>;
 
@@ -58,11 +108,47 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="max-w-3xl mx-auto space-y-6">
+    <div className="max-w-3xl mx-auto space-y-6 px-4">
       <div className="bg-white rounded-lg p-5 shadow">
         <h2 className="text-lg font-bold mb-2">Профиль</h2>
         <p className="text-sm text-gray-600">Email: {user.email}</p>
+        {profile?.first_name && <p className="text-sm text-gray-600">Имя: {profile.first_name}</p>}
+        {profile?.last_name && <p className="text-sm text-gray-600">Фамилия: {profile.last_name}</p>}
+        {profile?.phone && <p className="text-sm text-gray-600">Телефон: {profile.phone}</p>}
+        {defaultAddress && (
+          <div className="text-sm text-gray-600 mt-2">
+            <p className="font-medium">Адрес по умолчанию:</p>
+            <p>{defaultAddress.city}, {defaultAddress.street} {defaultAddress.house}{defaultAddress.apartment ? `, кв. ${defaultAddress.apartment}` : ''}</p>
+            <p>{defaultAddress.full_name}, {defaultAddress.phone}</p>
+          </div>
+        )}
+        <Link href="/profile/edit" className="text-accent text-sm hover:underline mt-2 inline-block">Редактировать профиль</Link>
       </div>
+
+      {unreviewed.length > 0 && (
+        <div className="bg-white rounded-lg p-5 shadow">
+          <h2 className="text-lg font-bold mb-4">Товары для отзыва</h2>
+          <div className="space-y-2">
+            {unreviewed.map((item) => (
+              <div key={item.product_id} className="flex items-center gap-3 bg-gray-50 rounded p-2">
+                {item.image_url ? (
+                  <img src={item.image_url} alt={item.name} className="w-10 h-10 object-cover rounded" />
+                ) : (
+                  <div className="w-10 h-10 bg-gray-200 rounded" />
+                )}
+                <div className="flex-1 text-sm">
+                  <Link href={`/products/${item.product_id}`} className="font-medium text-accent hover:underline">
+                    {item.name}
+                  </Link>
+                </div>
+                <Link href={`/products/${item.product_id}`} className="text-xs bg-accent text-white px-3 py-1 rounded hover:brightness-105">
+                  Оставить отзыв
+                </Link>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg p-5 shadow">
         <h2 className="text-lg font-bold mb-4">История заказов</h2>
@@ -72,7 +158,7 @@ export default function ProfilePage() {
           <div className="space-y-4">
             {orders.map((order) => (
               <div key={order.id} className="border rounded-lg overflow-hidden">
-                <div className="bg-gray-50 px-4 py-3 flex items-center justify-between border-b">
+                <div className="bg-gray-50 px-4 py-3 flex flex-wrap items-center justify-between border-b gap-2">
                   <div>
                     <span className="font-bold">Заказ №{order.id}</span>
                     <span className="text-sm text-gray-500 ml-2">{new Date(order.created_at).toLocaleDateString()}</span>
@@ -95,10 +181,20 @@ export default function ProfilePage() {
                           ) : (
                             <div className="w-10 h-10 bg-gray-200 rounded" />
                           )}
-                          <div className="flex-1 text-sm">
-                            <p className="m-0 font-medium">{item.product.name}</p>
+                          <div className="flex-1 text-sm min-w-0">
+                            <Link href={`/products/${item.product.id}`} className="m-0 font-medium text-accent hover:underline truncate block">
+                              {item.product.name}
+                            </Link>
                             <p className="m-0 text-xs text-gray-500">{item.size} × {item.quantity} = {Math.round(item.price * item.quantity)} ₽</p>
                           </div>
+                          {order.status === 'delivered' && (
+                            <Link
+                              href={`/products/${item.product.id}`}
+                              className="text-xs text-accent hover:underline shrink-0"
+                            >
+                              Оставить отзыв
+                            </Link>
+                          )}
                         </div>
                       ))}
                     </div>
