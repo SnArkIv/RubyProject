@@ -4,6 +4,7 @@ class Admin::UsersController < Admin::BaseController
   def index
     scope = User.order(created_at: :desc)
     scope = scope.where(role: params[:role]) if params[:role].present?
+    scope = scope.where("email ILIKE ?", "%#{params[:q]}%") if params[:q].present?
     @pagy, @users = pagy(scope, items: 20)
   end
 

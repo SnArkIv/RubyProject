@@ -1,6 +1,9 @@
 class Admin::BrandsController < Admin::BaseController
   def index
     @brands = Brand.order(:name)
+    if params[:q].present?
+      @brands = @brands.where("name ILIKE ?", "%#{params[:q]}%")
+    end
   end
 
   def new
@@ -31,8 +34,12 @@ class Admin::BrandsController < Admin::BaseController
 
   def destroy
     @brand = Brand.find(params[:id])
-    @brand.destroy
-    redirect_to admin_brands_path, notice: "Бренд удалён"
+    if @brand.products.exists?
+      redirect_to admin_brands_path, alert: "Нельзя удалить бренд, у которого есть товары"
+    else
+      @brand.destroy
+      redirect_to admin_brands_path, notice: "Бренд удалён"
+    end
   end
 
   private

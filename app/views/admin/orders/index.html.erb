@@ -2,8 +2,10 @@
 
 <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
   <%= form_with url: admin_orders_path, method: :get, local: true, class: "flex items-center gap-2" do %>
+    <%= text_field_tag :q, params[:q], placeholder: "Поиск (ID или email)", class: "px-3 py-1.5 rounded border border-[#999] bg-white" %>
     <%= select_tag :status, options_for_select([ [ "Все статусы", "" ], [ "Ожидает", "pending" ], [ "Подтверждён", "confirmed" ], [ "Отправлен", "shipped" ], [ "Доставлен", "delivered" ], [ "Отменён", "cancelled" ] ], params[:status]),
         class: "px-2 py-1.5 rounded border border-[#999] bg-white", onchange: "this.form.submit()" %>
+    <%= submit_tag "Найти", class: "bg-dark text-on-dark px-3 py-1.5 rounded text-sm cursor-pointer border-none" %>
   <% end %>
 </div>
 

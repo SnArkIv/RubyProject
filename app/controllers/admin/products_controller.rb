@@ -54,11 +54,16 @@ class Admin::ProductsController < Admin::BaseController
     params.require(:product).permit(
       :name, :description, :price, :discount, :sku, :status, :in_stock,
       :category_id, :brand_id, :gender, :material, :color, :care_instructions,
-      sizes: [], images: []
+      sizes: [], images: [], stock_by_size: {}
     )
   end
 
   def attach_images
+    if params[:product][:remove_images].present?
+      params[:product][:remove_images].each do |img_id|
+        @product.images.find_by(id: img_id)&.purge
+      end
+    end
     if params[:product][:images].present?
       params[:product][:images].each do |img|
         @product.images.attach(img)

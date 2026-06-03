@@ -11,17 +11,20 @@
 
   <div class="space-y-3">
     <div>
-      <%= f.label :name, "Название", class: "block text-sm font-medium mb-1" %>
-      <%= f.text_field :name, required: true, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      <%= f.label :name, "Название <span class='text-red-500'>*</span>".html_safe, class: "block text-sm font-medium mb-1" %>
+      <%= f.text_field :name, required: true, class: "w-full px-3 py-2 rounded border #{product.errors[:name].any? ? 'border-red-500' : 'border-[#999]'} bg-white" %>
+      <% if product.errors[:name].any? %><p class="text-red-500 text-xs mt-1"><%= product.errors[:name].first %></p><% end %>
     </div>
     <div>
       <%= f.label :sku, "Артикул", class: "block text-sm font-medium mb-1" %>
-      <%= f.text_field :sku, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+      <%= f.text_field :sku, class: "w-full px-3 py-2 rounded border #{product.errors[:sku].any? ? 'border-red-500' : 'border-[#999]'} bg-white" %>
+      <% if product.errors[:sku].any? %><p class="text-red-500 text-xs mt-1"><%= product.errors[:sku].first %></p><% end %>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
-        <%= f.label :price, "Цена", class: "block text-sm font-medium mb-1" %>
-        <%= f.number_field :price, required: true, step: 0.01, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        <%= f.label :price, "Цена <span class='text-red-500'>*</span>".html_safe, class: "block text-sm font-medium mb-1" %>
+        <%= f.number_field :price, required: true, step: 0.01, class: "w-full px-3 py-2 rounded border #{product.errors[:price].any? ? 'border-red-500' : 'border-[#999]'} bg-white" %>
+        <% if product.errors[:price].any? %><p class="text-red-500 text-xs mt-1"><%= product.errors[:price].first %></p><% end %>
       </div>
       <div>
         <%= f.label :discount, "Скидка %", class: "block text-sm font-medium mb-1" %>
@@ -30,12 +33,14 @@
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
-        <%= f.label :category_id, "Категория", class: "block text-sm font-medium mb-1" %>
-        <%= f.collection_select :category_id, @categories, :id, :name, { include_blank: true }, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        <%= f.label :category_id, "Категория <span class='text-red-500'>*</span>".html_safe, class: "block text-sm font-medium mb-1" %>
+        <%= f.collection_select :category_id, @categories, :id, :name, { include_blank: true }, class: "w-full px-3 py-2 rounded border #{product.errors[:category].any? ? 'border-red-500' : 'border-[#999]'} bg-white appearance-none bg-[length:12px] bg-[right_8px_center] bg-no-repeat", style: "background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")" %>
+        <% if product.errors[:category].any? %><p class="text-red-500 text-xs mt-1"><%= product.errors[:category].first %></p><% end %>
       </div>
       <div>
-        <%= f.label :brand_id, "Бренд", class: "block text-sm font-medium mb-1" %>
-        <%= f.collection_select :brand_id, @brands, :id, :name, { include_blank: true }, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+        <%= f.label :brand_id, "Бренд <span class='text-red-500'>*</span>".html_safe, class: "block text-sm font-medium mb-1" %>
+        <%= f.collection_select :brand_id, @brands, :id, :name, { include_blank: true }, class: "w-full px-3 py-2 rounded border #{product.errors[:brand].any? ? 'border-red-500' : 'border-[#999]'} bg-white appearance-none bg-[length:12px] bg-[right_8px_center] bg-no-repeat", style: "background-image: url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23666' d='M6 8L1 3h10z'/%3E%3C/svg%3E\")" %>
+        <% if product.errors[:brand].any? %><p class="text-red-500 text-xs mt-1"><%= product.errors[:brand].first %></p><% end %>
       </div>
     </div>
     <div class="grid grid-cols-2 gap-3">
@@ -53,8 +58,21 @@
     <div>
       <%= f.label :sizes, "Размеры", class: "block text-sm font-medium mb-1" %>
       <%= f.text_field :sizes, value: product.sizes&.join(", "), placeholder: "S, M, L, XL",
-          class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+          class: "w-full px-3 py-2 rounded border border-[#999] bg-white #{product.errors[:sizes].any? ? 'border-red-500' : ''}" %>
       <p class="text-xs text-[#888]">Через запятую</p>
+    </div>
+    <div id="stock-by-size" class="<%= product.sizes.blank? ? 'hidden' : '' %>">
+      <%= f.label :stock_by_size, "Количество по размерам", class: "block text-sm font-medium mb-1" %>
+      <p class="text-xs text-[#888] mb-2">Укажите количество для каждого размера</p>
+      <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="stock-size-fields">
+        <% product.sizes&.each do |sz| %>
+          <div class="flex items-center gap-1">
+            <span class="text-sm font-medium w-8"><%= sz %></span>
+            <%= number_field_tag "product[stock_by_size][#{sz}]", product.stock_by_size&.dig(sz) || 0, min: 0,
+                class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white text-sm" %>
+          </div>
+        <% end %>
+      </div>
     </div>
     <div class="grid grid-cols-2 gap-3">
       <div>
@@ -84,13 +102,20 @@
     </div>
     <div>
       <%= f.label :images, "Изображения", class: "block text-sm font-medium mb-1" %>
-      <%= f.file_field :images, multiple: true, accept: "image/*", class: "w-full" %>
+      <%= f.file_field :images, multiple: true, accept: "image/*", class: "w-full px-3 py-2 rounded border border-[#999] bg-white file:mr-3 file:py-1.5 file:px-3 file:rounded file:border-0 file:bg-accent file:text-white file:font-semibold file:text-sm hover:file:brightness-105" %>
       <% if product.images.attached? %>
-        <div class="flex gap-2 mt-2">
+        <div class="flex flex-wrap gap-3 mt-2">
           <% product.images.each do |img| %>
-            <%= image_tag url_for(img), class: "w-16 h-16 object-cover rounded" %>
+            <div class="relative group">
+              <%= image_tag url_for(img), class: "w-16 h-16 object-cover rounded" %>
+              <label class="absolute -top-1 -right-1 bg-red-500 text-white rounded-full w-5 h-5 flex items-center justify-center text-xs cursor-pointer opacity-0 group-hover:opacity-100 transition">
+                <input type="checkbox" name="product[remove_images][]" value="<%= img.id %>" class="hidden" />
+                <span>×</span>
+              </label>
+            </div>
           <% end %>
         </div>
+        <p class="text-xs text-[#888] mt-1">Наведите на фото для удаления</p>
       <% end %>
     </div>
     <div class="flex gap-3 items-center pt-2">
@@ -99,3 +124,33 @@
     </div>
   </div>
 <% end %>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  const sizesInput = document.querySelector('#product_sizes');
+  const stockContainer = document.querySelector('#stock-by-size');
+  const stockFields = document.querySelector('#stock-size-fields');
+
+  if (sizesInput) {
+    sizesInput.addEventListener('input', function() {
+      const sizes = this.value.split(',').map(s => s.trim()).filter(Boolean);
+      if (sizes.length > 0) {
+        stockContainer.classList.remove('hidden');
+        const currentFields = {};
+        stockFields.querySelectorAll('input').forEach(inp => {
+          const label = inp.closest('.flex')?.querySelector('span')?.textContent;
+          if (label) currentFields[label] = inp.value;
+        });
+        stockFields.innerHTML = sizes.map(sz => `
+          <div class="flex items-center gap-1">
+            <span class="text-sm font-medium w-8">${sz}</span>
+            <input type="number" name="product[stock_by_size][${sz}]" value="${currentFields[sz] || 0}" min="0" class="w-full px-2 py-1.5 rounded border border-[#999] bg-white text-sm" />
+          </div>
+        `).join('');
+      } else {
+        stockContainer.classList.add('hidden');
+      }
+    });
+  }
+});
+</script>

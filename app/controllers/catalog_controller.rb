@@ -26,14 +26,14 @@ class CatalogController < ApplicationController
     when "discount"
       scope.discount_desc
     else
-      scope.newest
+      scope.in_stock_first
     end
 
     @pagy, @products = pagy(scope, items: 12)
     @categories = Category.order(:name)
     @brands = Brand.order(:name)
     @colors = Product.where.not(color: [ nil, "" ]).distinct.pluck(:color).sort
-    @sizes = Product.where("sizes <> '{}'").distinct.pluck(:sizes).flatten.uniq.sort
+    @sizes = Product.where("sizes <> '{}'").distinct.pluck(:sizes).flatten.uniq.sort_by { |s| s.to_i }
   end
 
   private

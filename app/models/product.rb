@@ -21,6 +21,8 @@ class Product < ApplicationRecord
   validates :discount, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 100 }
   validates :stock_quantity, numericality: { greater_than_or_equal_to: 0 }
 
+  before_save :auto_generate_sku
+
   scope :published, -> { where(status: :published) }
   scope :in_stock, -> { where(in_stock: true) }
   scope :on_sale, -> { where("discount > 0") }
@@ -45,11 +47,13 @@ class Product < ApplicationRecord
   scope :price_asc, -> { order(price: :asc) }
   scope :price_desc, -> { order(price: :desc) }
   scope :newest, -> { order(created_at: :desc) }
+  scope :in_stock_first, -> { order(Arel.sql("in_stock DESC, created_at DESC")) }
   scope :discount_desc, -> { order(discount: :desc) }
   scope :by_popularity, -> {
-    left_joins(:order_items)
-      .group(:id)
-      .order(Arel.sql("COALESCE(SUM(order_items.quantity), 0) DESC"))
+    select("products.*, COALESCE((
+      SELECT SUM(order_items.quantity) FROM order_items WHERE order_items.product_id = products.id
+    ), 0) as popularity_score")
+      .order(Arel.sql("popularity_score DESC"))
   }
   scope :similar, ->(product) {
     where(category_id: product.category_id)
@@ -87,5 +91,32 @@ class Product < ApplicationRecord
 
   def low_stock?
     in_stock? && stock_quantity > 0 && stock_quantity < 50
+  end
+
+  def gender_label
+    GENDERS[gender] || gender
+  end
+
+  def stock_for_size(size)
+    return stock_quantity if stock_by_size.blank? || stock_by_size.empty?
+    stock_by_size[size.to_s].to_i
+  end
+
+  def in_stock_for_size?(size)
+    in_stock? && stock_for_size(size) > 0
+  end
+
+  def total_available_stock
+    return stock_quantity if stock_by_size.blank? || stock_by_size.empty?
+    stock_by_size.values.sum(&:to_i)
+  end
+
+  private
+
+  def auto_generate_sku
+    return if sku.present?
+    prefix = category&.name&.first(3)&.upcase || "PRD"
+    count = Product.where(category_id: category_id).count + 1
+    self.sku = "#{prefix}-#{count.to_s.rjust(4, '0')}"
   end
 end

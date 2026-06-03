@@ -16,20 +16,20 @@ module Api
         scope = scope.price_max(@query[:price_max])
         scope = scope.in_stock if @query[:in_stock].present?
 
-        scope = case @query[:sort]
+scope = case @query[:sort]
         when "price_asc" then scope.price_asc
         when "price_desc" then scope.price_desc
         when "popularity" then scope.by_popularity
         when "newest" then scope.newest
         when "discount" then scope.discount_desc
-        else scope.newest
+        else scope.in_stock_first
         end
 
         @pagy, @products = pagy(scope, items: 12)
         @categories = Category.order(:name)
         @brands = Brand.order(:name)
         @colors = Product.where.not(color: [nil, ""]).distinct.pluck(:color).sort
-        @sizes = Product.where("sizes <> '{}'").distinct.pluck(:sizes).flatten.uniq.sort
+        @sizes = Product.where("sizes <> '{}'").distinct.pluck(:sizes).flatten.uniq.sort_by { |s| s.to_i }
       end
 
       private
