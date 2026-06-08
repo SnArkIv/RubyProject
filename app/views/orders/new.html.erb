@@ -17,6 +17,9 @@
     <% end %>
 
     <%= form_with model: @order, url: orders_path, local: true, data: { controller: "auto-submit" } do |f| %>
+      <% @cart_items.each do |item| %>
+        <%= hidden_field_tag "cart_item_ids[]", item.id %>
+      <% end %>
       <%= f.hidden_field :shipping_address, id: "order_shipping_address_hidden" %>
       <div class="mb-4" id="address-field">
         <%= f.label :shipping_address, "Адрес доставки", class: "block mb-1 font-medium text-sm" %>
