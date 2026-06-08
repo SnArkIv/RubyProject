@@ -388,7 +388,7 @@ ITEMS = [
     description: "Вязаная шапка крупной вязки. Базовый аксессуар.",
     price: 990, discount: 0, stock_quantity: 150,
     sku: "NW-ACC-001", category: categories[:аксессуары], brand: brands[:nordicwool],
-    gender: "all", sizes: %w[One size], material: "100% шерсть", color: "Чёрный",
+    gender: "all", sizes: %w[S M L], material: "100% шерсть", color: "Чёрный",
     care_instructions: "Ручная стирка",
     img: "https://images.unsplash.com/photo-1576871337622-98d48d1cf531?w=600&h=600&fit=crop"
   },
@@ -397,7 +397,7 @@ ITEMS = [
     description: "Мягкий шарф из кашемира. Добавляет уюта.",
     price: 3_490, discount: 0, stock_quantity: 0,
     sku: "EL-ACC-001", category: categories[:аксессуары], brand: brands[:elegance],
-    gender: "all", sizes: %w[One size], material: "100% кашемир", color: "Бежевый",
+    gender: "all", sizes: %w[S M L], material: "100% кашемир", color: "Бежевый",
     care_instructions: "Только химчистка",
     img: "https://images.unsplash.com/photo-1605458559597-4fb127e09d16?w=600&h=600&fit=crop"
   },
@@ -406,7 +406,7 @@ ITEMS = [
     description: "Компактный рюкзак с отделением для ноутбука.",
     price: 4_990, discount: 0, stock_quantity: 30,
     sku: "UE-ACC-001", category: categories[:аксессуары], brand: brands[:urbanedge],
-    gender: "all", sizes: %w[One size], material: "100% нейлон", color: "Чёрный",
+    gender: "all", sizes: %w[S M L], material: "100% нейлон", color: "Чёрный",
     care_instructions: "Протирать влажной губкой",
     img: "https://images.unsplash.com/photo-1622560480605-d83c853bc5c3?w=600&h=600&fit=crop"
   },

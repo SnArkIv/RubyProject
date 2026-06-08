@@ -81,18 +81,62 @@
           </div>
         </div>
           <details class="mt-2">
-            <summary class="text-xs text-[#888] cursor-pointer hover:text-accent">Таблица размеров</summary>
+            <summary class="text-xs text-[#888] cursor-pointer hover:text-accent">
+              <% if @product.category&.name&.downcase&.include?("аксессуар") %>
+                Руководство по размерам
+              <% else %>
+                Таблица размеров
+              <% end %>
+            </summary>
             <div class="mt-2 text-xs text-[#666] bg-[#f8f8f8] rounded p-2 overflow-x-auto">
-              <table class="w-full text-left min-w-[300px]">
-                <thead><tr class="border-b border-[#ddd]"><th class="pr-2">Размер</th><th class="pr-2">Обхват груди</th><th class="pr-2">Обхват талии</th><th>Обхват бёдер</th></tr></thead>
-                <tbody>
-                  <tr><td class="pr-2">XS</td><td class="pr-2">82-86</td><td class="pr-2">62-66</td><td>88-92</td></tr>
-                  <tr><td class="pr-2">S</td><td class="pr-2">86-90</td><td class="pr-2">66-70</td><td>92-96</td></tr>
-                  <tr><td class="pr-2">M</td><td class="pr-2">90-94</td><td class="pr-2">70-74</td><td>96-100</td></tr>
-                  <tr><td class="pr-2">L</td><td class="pr-2">94-100</td><td class="pr-2">74-80</td><td>100-106</td></tr>
-                  <tr><td class="pr-2">XL</td><td class="pr-2">100-106</td><td class="pr-2">80-86</td><td>106-112</td></tr>
-                </tbody>
-              </table>
+              <% if @product.category&.name&.downcase&.include?("аксессуар") %>
+                <% if @product.name.downcase.include?("шапка") || @product.name.downcase.include?("кепк") || @product.name.downcase.include?("берет") %>
+                  <table class="w-full text-left min-w-[260px]">
+                    <thead><tr class="border-b border-[#ddd]"><th class="pr-2">Размер</th><th class="pr-2">Обхват головы, см</th></tr></thead>
+                    <tbody>
+                      <tr><td class="pr-2">S</td><td>54 – 55</td></tr>
+                      <tr><td class="pr-2">M</td><td>56 – 57</td></tr>
+                      <tr><td class="pr-2">L</td><td>58 – 60</td></tr>
+                    </tbody>
+                  </table>
+                <% elsif @product.name.downcase.include?("шарф") %>
+                  <table class="w-full text-left min-w-[260px]">
+                    <thead><tr class="border-b border-[#ddd]"><th class="pr-2">Размер</th><th class="pr-2">Длина × Ширина</th></tr></thead>
+                    <tbody>
+                      <tr><td class="pr-2">S</td><td>150 × 20 см</td></tr>
+                      <tr><td class="pr-2">M</td><td>180 × 30 см</td></tr>
+                      <tr><td class="pr-2">L</td><td>200 × 35 см</td></tr>
+                    </tbody>
+                  </table>
+                <% elsif @product.name.downcase.include?("рюкзак") || @product.name.downcase.include?("сумка") %>
+                  <table class="w-full text-left min-w-[260px]">
+                    <thead><tr class="border-b border-[#ddd]"><th class="pr-2">Размер</th><th class="pr-2">Объём / Габариты</th></tr></thead>
+                    <tbody>
+                      <tr><td class="pr-2">S</td><td>8 – 10 л / 30 × 20 × 10 см</td></tr>
+                      <tr><td class="pr-2">M</td><td>15 – 20 л / 40 × 30 × 15 см</td></tr>
+                      <tr><td class="pr-2">L</td><td>25 – 30 л / 45 × 35 × 20 см</td></tr>
+                    </tbody>
+                  </table>
+                <% else %>
+                  <table class="w-full text-left min-w-[260px]">
+                    <thead><tr class="border-b border-[#ddd]"><th class="pr-2">Размер</th><th class="pr-2">Описание</th></tr></thead>
+                    <tbody>
+                      <tr><td class="pr-2">Универсальный</td><td>Стандартный размер, подходит большинству</td></tr>
+                    </tbody>
+                  </table>
+                <% end %>
+              <% else %>
+                <table class="w-full text-left min-w-[300px]">
+                  <thead><tr class="border-b border-[#ddd]"><th class="pr-2">Размер</th><th class="pr-2">Обхват груди</th><th class="pr-2">Обхват талии</th><th>Обхват бёдер</th></tr></thead>
+                  <tbody>
+                    <tr><td class="pr-2">XS</td><td class="pr-2">82-86</td><td class="pr-2">62-66</td><td>88-92</td></tr>
+                    <tr><td class="pr-2">S</td><td class="pr-2">86-90</td><td class="pr-2">66-70</td><td>92-96</td></tr>
+                    <tr><td class="pr-2">M</td><td class="pr-2">90-94</td><td class="pr-2">70-74</td><td>96-100</td></tr>
+                    <tr><td class="pr-2">L</td><td class="pr-2">94-100</td><td class="pr-2">74-80</td><td>100-106</td></tr>
+                    <tr><td class="pr-2">XL</td><td class="pr-2">100-106</td><td class="pr-2">80-86</td><td>106-112</td></tr>
+                  </tbody>
+                </table>
+              <% end %>
             </div>
           </details>
         <%= submit_tag "Добавить в корзину",
