@@ -50,13 +50,11 @@
                 <% end %>
               </td>
               <td class="p-4">
-                <turbo-frame id="qty_<%= item.id %>">
-                  <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", data: { controller: "auto-submit" } do %>
-                    <%= number_field_tag :quantity, item.quantity, min: 1,
-                          class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center",
-                          data: { action: "change->auto-submit#submit" } %>
-                  <% end %>
-                </turbo-frame>
+                <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", local: true do %>
+                  <%= number_field_tag :quantity, item.quantity, min: 1,
+                        class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center",
+                        onchange: "this.form.submit()" %>
+                <% end %>
               </td>
               <td class="p-4 font-bold"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</td>
               <td class="p-4">
@@ -105,13 +103,11 @@
           </div>
         </div>
         <div class="flex items-center justify-between gap-3">
-          <turbo-frame id="mobile_qty_<%= item.id %>">
-            <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", data: { controller: "auto-submit" } do %>
-              <%= number_field_tag :quantity, item.quantity, min: 1,
-                    class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center text-sm",
-                    data: { action: "change->auto-submit#submit" } %>
-            <% end %>
-          </turbo-frame>
+          <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", local: true do %>
+            <%= number_field_tag :quantity, item.quantity, min: 1,
+                  class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center text-sm",
+                  onchange: "this.form.submit()" %>
+          <% end %>
           <div class="font-bold text-sm"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</div>
         </div>
         <div class="flex items-center gap-2 mt-3">
