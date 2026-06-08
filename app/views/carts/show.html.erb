@@ -189,7 +189,10 @@
   function updateCartTotal() {
     var total = 0;
     var count = 0;
+    var seen = {};
     document.querySelectorAll('.cart-checkbox:checked').forEach(function(cb) {
+      if (seen[cb.value]) return;
+      seen[cb.value] = true;
       var row = cb.closest('.cart-item-row');
       if (!row) return;
       var price = getUnitPrice(row);
@@ -207,6 +210,14 @@
       cb.checked = checked;
     });
     updateCartTotal();
+  }
+
+  function syncCheckbox(cb) {
+    var val = cb.value;
+    var checked = cb.checked;
+    document.querySelectorAll('.cart-checkbox[value="' + val + '"]').forEach(function(other) {
+      if (other !== cb) other.checked = checked;
+    });
   }
 
   function sendUpdate(id, quantity) {
@@ -283,7 +294,10 @@
     if (btn.disabled) return;
     var form = document.getElementById('checkout-form');
     form.innerHTML = '';
+    var seen = {};
     document.querySelectorAll('.cart-checkbox:checked').forEach(function(cb) {
+      if (seen[cb.value]) return;
+      seen[cb.value] = true;
       var h = document.createElement('input');
       h.type = 'hidden'; h.name = 'cart_item_ids[]'; h.value = cb.value;
       form.appendChild(h);
@@ -294,7 +308,10 @@
   // Bind listeners on load
   (function() {
     document.querySelectorAll('.cart-checkbox').forEach(function(cb) {
-      cb.addEventListener('change', updateCartTotal);
+      cb.addEventListener('change', function(e) {
+        syncCheckbox(e.target);
+        updateCartTotal();
+      });
     });
     updateCartTotal();
   })();
