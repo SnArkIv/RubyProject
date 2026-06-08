@@ -151,18 +151,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_06_04_000003) do
     t.index ["sku"], name: "index_products_on_sku", unique: true
   end
 
-  create_table "promo_codes", force: :cascade do |t|
-    t.boolean "active", default: true
-    t.string "code", null: false
-    t.datetime "created_at", null: false
-    t.integer "discount", default: 0, null: false
-    t.datetime "expires_at"
-    t.integer "max_uses"
-    t.datetime "updated_at", null: false
-    t.integer "uses_count", default: 0
-    t.index ["code"], name: "index_promo_codes_on_code", unique: true
-  end
-
   create_table "reviews", force: :cascade do |t|
     t.text "comment"
     t.datetime "created_at", null: false

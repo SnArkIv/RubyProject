@@ -1,77 +1,80 @@
 <% content_for :title, "Оформление заказа — Магазин" %>
 
-<h1 class="mt-0">Оформление заказа</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">Оформление заказа</h1>
 
-<div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-6 items-start">
-  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-    <h2 class="mt-0 mb-4">Адрес и доставка</h2>
+<div class="grid grid-cols-1 lg:grid-cols-[1fr_320px] gap-4 md:gap-6 items-start">
+  <div class="bg-white rounded-lg p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <h2 class="mt-0 mb-4 text-lg md:text-xl">Адрес и доставка</h2>
 
     <% if @order&.errors&.any? %>
-      <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">
+      <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4 text-sm">
         <ul class="list-disc pl-5 m-0">
-          <% @order.errors.full_messages.each do |msg| %>
-            <li><%= msg %></li>
+          <% @order.errors.each do |error| %>
+            <li><%= t("activerecord.attributes.order.#{error.attribute}", default: error.attribute.to_s.humanize) %> <%= error.message %></li>
           <% end %>
         </ul>
       </div>
     <% end %>
 
     <%= form_with model: @order, url: orders_path, local: true, data: { controller: "auto-submit" } do |f| %>
+      <%= f.hidden_field :shipping_address, id: "order_shipping_address_hidden" %>
       <div class="mb-4" id="address-field">
-        <%= f.label :shipping_address, "Адрес доставки", class: "block mb-1 font-medium" %>
+        <%= f.label :shipping_address, "Адрес доставки", class: "block mb-1 font-medium text-sm" %>
         <% if @addresses.any? %>
           <div class="space-y-2 mb-3">
             <% @addresses.each do |addr| %>
-              <label class="flex items-start gap-2 text-sm cursor-pointer border border-[#eee] rounded p-2 hover:bg-page">
-                <%= radio_button_tag :address_preset, addr.id, addr.is_default?, class: "accent-accent mt-0.5", data: { address: [ addr.city, addr.street, addr.house, addr.apartment, addr.zip_code ].compact.join(", ") } %>
-                <div>
+              <label class="flex items-start gap-2 text-sm cursor-pointer border border-[#eee] rounded p-2 hover:bg-page"
+                     onclick="document.getElementById('order_shipping_address_hidden').value = '<%= j [addr.city, addr.street, addr.house, addr.apartment, addr.zip_code].compact.join(', ') %>'; this.closest('.space-y-2').querySelectorAll('label').forEach(l => l.style.borderColor = '#eee'); this.style.borderColor = '#2563eb'">
+                <%= radio_button_tag :address_preset, addr.id, addr.is_default?, class: "accent-accent mt-0.5 shrink-0" %>
+                <div class="min-w-0">
                   <div><%= addr.full_name %> | <%= addr.phone %></div>
-                  <div class="text-[#888]"><%= addr.city %>, <%= addr.street %> <%= addr.house %>, кв. <%= addr.apartment %>, <%= addr.zip_code %></div>
+                  <div class="text-[#888] text-xs md:text-sm"><%= addr.city %>, <%= addr.street %> <%= addr.house %>, кв. <%= addr.apartment %>, <%= addr.zip_code %></div>
                 </div>
               </label>
             <% end %>
           </div>
+        <% else %>
+          <div class="bg-[#fff3cd] text-[#856404] px-4 py-3 rounded mb-3 text-sm">
+            <p class="m-0">У вас нет сохранённых адресов. <%= link_to "Добавить адрес", addresses_path, class: "text-accent underline" %>, чтобы оформить доставку.</p>
+          </div>
         <% end %>
-        <%= f.text_area :shipping_address, rows: 4,
-            class: "w-full px-3 py-2 rounded border border-[#999] bg-white",
-            placeholder: "Город, улица, дом, квартира, индекс" %>
       </div>
 
       <div class="mb-4">
-        <%= f.label :delivery_method, "Способ доставки", class: "block mb-1 font-medium" %>
+        <%= f.label :delivery_method, "Способ доставки", class: "block mb-1 font-medium text-sm" %>
         <%= f.select :delivery_method,
             options_for_select(Order::DELIVERY_METHODS.map { |k, v| [ v, k ] }),
-            {}, class: "w-full px-3 py-2 rounded border border-[#999] bg-white",
+            {}, class: "w-full px-3 py-2 rounded border border-[#999] bg-white text-sm",
             data: { action: "change->auto-submit#toggleAddress" } %>
       </div>
 
       <div class="mb-4">
-        <%= f.label :payment_method, "Способ оплаты", class: "block mb-1 font-medium" %>
+        <%= f.label :payment_method, "Способ оплаты", class: "block mb-1 font-medium text-sm" %>
         <%= f.select :payment_method,
             options_for_select(Order::PAYMENT_METHODS.map { |k, v| [ v, k ] }),
-            {}, class: "w-full px-3 py-2 rounded border border-[#999] bg-white" %>
+            {}, class: "w-full px-3 py-2 rounded border border-[#999] bg-white text-sm" %>
       </div>
 
-      <div class="flex gap-3 items-center">
-        <%= f.submit "Подтвердить заказ", class: "bg-accent text-white px-5 py-2 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
-        <%= link_to "Вернуться в корзину", cart_path, class: "text-text no-underline hover:underline" %>
+      <div class="flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
+        <%= f.submit "Подтвердить заказ", class: "bg-accent text-white px-5 py-2.5 rounded-md cursor-pointer font-semibold border-none hover:brightness-105" %>
+        <%= link_to "Вернуться в корзину", cart_path, class: "text-text no-underline hover:underline text-sm text-center sm:text-left" %>
       </div>
     <% end %>
   </div>
 
-  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-    <h3 class="mt-0 mb-3">Ваш заказ</h3>
+  <div class="bg-white rounded-lg p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <h3 class="mt-0 mb-3 text-base md:text-lg">Ваш заказ</h3>
     <ul class="list-none m-0 p-0 space-y-2">
       <% @cart_items.each do |item| %>
         <li class="flex justify-between text-sm">
-          <span><%= item.product.name %> (<%= item.size %>) × <%= item.quantity %></span>
-          <span class="font-medium"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</span>
+          <span class="min-w-0 pr-2"><%= item.product.name %> (<%= item.size %>) × <%= item.quantity %></span>
+          <span class="font-medium shrink-0"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</span>
         </li>
       <% end %>
     </ul>
-    <div class="border-t border-[#eee] mt-3 pt-3 flex justify-between font-bold text-lg">
+    <div class="border-t border-[#eee] mt-3 pt-3 flex justify-between font-bold text-base md:text-lg">
       <span>Итого:</span>
-      <span><%= format("%.0f", @cart.total_amount) %> ₽</span>
+      <span><%= format("%.0f", @cart_items.sum { |item| item.product.final_price * item.quantity }) %> ₽</span>
     </div>
   </div>
 </div>

@@ -1,6 +1,6 @@
 <% content_for :title, "Восстановление пароля — Магазин" %>
 
-<div class="max-w-[420px] mx-auto my-8 p-8 bg-cream rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)]">
+<div class="max-w-[420px] mx-auto my-4 md:my-8 p-5 md:p-8 bg-cream rounded-lg shadow-[0_4px_20px_rgba(0,0,0,0.08)] mx-4 md:mx-auto">
   <h1>Восстановление пароля</h1>
 
   <%= form_for(resource, as: resource_name, url: password_path(resource_name), html: { method: :post }) do |f| %>

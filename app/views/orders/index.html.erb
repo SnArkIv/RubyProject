@@ -1,30 +1,30 @@
 <% content_for :title, "История заказов — Магазин" %>
 
-<h1 class="mt-0">История заказов</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">История заказов</h1>
 
 <% if @orders.any? %>
   <div class="space-y-4">
     <% @orders.each do |order| %>
-      <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-        <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+      <div class="bg-white rounded-lg p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-3">
           <div>
-            <span class="font-bold text-lg">Заказ №<%= order.id %></span>
-            <span class="text-sm text-[#888] ml-2"><%= l(order.created_at, format: :long) %></span>
+            <span class="font-bold text-base md:text-lg">Заказ №<%= order.id %></span>
+            <span class="text-xs md:text-sm text-[#888] ml-2"><%= l(order.created_at, format: :long) %></span>
           </div>
-          <div class="flex items-center gap-3">
-            <span class="text-sm px-3 py-1 rounded-full bg-page font-medium"><%= t("order.status.#{order.status}") %></span>
-            <span class="font-bold"><%= format("%.0f", order.total_amount) %> ₽</span>
+          <div class="flex items-center gap-2 md:gap-3">
+            <span class="text-xs md:text-sm px-2 md:px-3 py-1 rounded-full bg-page font-medium"><%= t("order.status.#{order.status}") %></span>
+            <span class="font-bold text-sm md:text-base"><%= format("%.0f", order.total_amount) %> ₽</span>
           </div>
         </div>
-        <div class="text-sm text-[#888] mb-3 space-y-1">
+        <div class="text-xs md:text-sm text-[#888] mb-3 space-y-1">
           <p class="m-0"><strong>Адрес:</strong> <%= order.shipping_address %></p>
           <p class="m-0"><strong>Доставка:</strong> <%= order.delivery_method_label %></p>
           <p class="m-0"><strong>Оплата:</strong> <%= order.payment_method_label %></p>
         </div>
-        <div class="flex flex-wrap items-center gap-3">
+        <div class="flex flex-wrap items-center gap-2 md:gap-3">
           <%= link_to "Подробнее", order_path(order), class: "text-accent no-underline hover:underline text-sm" %>
           <%= button_to "Повторить заказ", repeat_order_path(order), method: :post,
-              class: "text-sm bg-page text-text px-3 py-1.5 rounded cursor-pointer border-none hover:bg-[#eee]" %>
+              class: "text-xs md:text-sm bg-page text-text px-3 py-1.5 rounded cursor-pointer border-none hover:bg-[#eee]" %>
         </div>
       </div>
     <% end %>

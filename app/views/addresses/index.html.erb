@@ -1,10 +1,10 @@
 <% content_for :title, "Адреса доставки — Магазин" %>
 
-<h1 class="mt-0">Адреса доставки</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">Адреса доставки</h1>
 
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <div class="bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
-    <h2 class="mt-0 mb-4">Добавить адрес</h2>
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+  <div class="bg-white rounded-lg p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+    <h2 class="mt-0 mb-4 text-lg md:text-xl">Добавить адрес</h2>
     <%= form_with model: @address, url: addresses_path, local: true do |f| %>
       <% if @address&.errors&.any? %>
         <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">

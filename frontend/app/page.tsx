@@ -110,6 +110,7 @@ export default function HomePage() {
                 style={{
                   backgroundColor: ['#1a1a1a', '#2d1b1b', '#1b2d1b', '#1b1b2d', '#2d2d1b', '#1b2d2d'][cat.id % 6],
                 }}>
+                <div className="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
                 <div className="absolute inset-0 opacity-[0.07] flex items-center justify-center p-8">
                   <svg viewBox="0 0 24 24" fill="white" className="w-full h-full">
                     <path d={iconPath}/>
@@ -196,16 +197,6 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
-      <section className="py-16 bg-[#e63946] text-white text-center">
-        <div className="max-w-3xl mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-4">Готовы обновить гардероб?</h2>
-          <p className="text-white/80 mb-8">Первая покупка со скидкой 10% по промокоду <strong>НАЧАЛО</strong>.</p>
-          <Link href="/catalog" className="inline-block bg-white text-[#e63946] px-8 py-3 rounded-md font-semibold hover:bg-white/90 transition">
-            Перейти в каталог
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

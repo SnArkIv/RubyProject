@@ -10,7 +10,8 @@
 </div>
 
 <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
-  <table class="w-full text-left border-collapse">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left border-collapse min-w-[700px]">
     <thead>
       <tr class="border-b border-[#eee]">
         <th class="p-3 font-semibold">№</th>
@@ -42,6 +43,7 @@
       <% end %>
     </tbody>
   </table>
+  </div>
   <% if @pagy.pages > 1 %>
     <div class="p-3 flex justify-center"><%= render "shared/pagination", pagy: @pagy %></div>
   <% end %>

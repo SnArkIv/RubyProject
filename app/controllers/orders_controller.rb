@@ -12,40 +12,52 @@ class OrdersController < ApplicationController
   end
 
   def new
-    @order = Order.new
+    default_addr = current_user.addresses.find_by(is_default: true)
+    @order = Order.new(
+      shipping_address: default_addr ? [default_addr.city, default_addr.street, default_addr.house, default_addr.apartment, default_addr.zip_code].compact.join(", ") : ""
+    )
     @addresses = current_user.addresses.order(is_default: :desc, created_at: :desc)
   end
 
   def create
-    @order = current_user.orders.build(order_params.except(:promo_code))
+    @order = current_user.orders.build(order_params)
     @order.status = :pending
     @order.shipping_address = "Самовывоз" if @order.delivery_method == "pickup" && @order.shipping_address.blank?
 
-    @cart_items.each do |item|
-      unless item.product.in_stock && item.product.stock_quantity >= item.quantity
-        redirect_to cart_path, alert: "Товар «#{item.product.name}» больше нет в наличии в нужном количестве"
+    cart_items = @cart_items
+    if params[:single_item_id].present?
+      cart_items = cart_items.where(id: params[:single_item_id])
+    end
+
+    if cart_items.empty?
+      redirect_to cart_path, alert: "Корзина пуста"
+      return
+    end
+
+    cart_items.each do |item|
+      unless item.product.in_stock_for_size?(item.size) && item.product.stock_for_size(item.size) >= item.quantity
+        redirect_to cart_path, alert: "Товар «#{item.product.name}» (#{item.size}) больше нет в наличии в нужном количестве"
         return
       end
     end
 
-    base_amount = @cart_items.sum { |item| item.product.final_price * item.quantity }
-    @promo_code_record = find_promo(order_params[:promo_code])
-    @order.total_amount = apply_promo(base_amount, @promo_code_record)
+    @order.total_amount = cart_items.sum { |item| item.product.final_price * item.quantity }
 
     if @order.save
-      @promo_code_record&.use!
-      @cart_items.each do |item|
+      cart_items.each do |item|
         @order.order_items.create!(
           product: item.product,
           size: item.size,
           quantity: item.quantity,
           price: item.product.final_price
         )
-                new_stock = [item.product.stock_quantity - item.quantity, 0].max
-        item.product.update_columns(stock_quantity: new_stock, in_stock: new_stock > 0)
+                new_stock = [item.product.stock_for_size(item.size) - item.quantity, 0].max
+        new_stock_by_size = (item.product.stock_by_size || {}).merge(item.size => new_stock)
+        total = new_stock_by_size.values.sum(&:to_i)
+        item.product.update_columns(stock_by_size: new_stock_by_size, stock_quantity: total, in_stock: total > 0)
       end
 
-      current_cart.cart_items.destroy_all
+      cart_items.destroy_all
       OrderMailer.confirmation(@order).deliver_later
       OrderMailer.notify_admin(@order).deliver_later
       redirect_to order_path(@order), notice: "Заказ успешно оформлен"
@@ -77,22 +89,29 @@ class OrdersController < ApplicationController
     @cart = current_cart
     @cart_items = @cart.cart_items.includes(product: { images_attachments: :blob })
 
+    if params[:from_cart].present? && params[:cart_item_ids].blank?
+      redirect_to cart_path, alert: "Выберите товары для заказа."
+      return
+    end
+
+    if params[:cart_item_ids].present?
+      @cart_items = @cart_items.where(id: params[:cart_item_ids])
+    end
+
     if @cart_items.empty?
-      redirect_to cart_path, alert: "Корзина пуста. Добавьте товары перед оформлением заказа."
+      redirect_to cart_path, alert: "Корзина пуста. Выберите товары для заказа."
     end
   end
 
   def order_params
-    params.require(:order).permit(:shipping_address, :delivery_method, :payment_method, :promo_code)
-  end
-
-  def find_promo(code)
-    return nil if code.blank?
-    PromoCode.active.find_by(code: code)
-  end
-
-  def apply_promo(amount, promo)
-    return amount if promo.nil? || !promo.valid_for_use?
-    amount * (1 - promo.discount / 100.0)
+    if params[:order].present?
+      params.require(:order).permit(:shipping_address, :delivery_method, :payment_method)
+    elsif params[:single_item_id].present?
+      ActionController::Parameters.new(
+        shipping_address: "Самовывоз", delivery_method: "pickup", payment_method: "cash"
+      ).permit!
+    else
+      params.require(:order).permit(:shipping_address, :delivery_method, :payment_method)
+    end
   end
 end

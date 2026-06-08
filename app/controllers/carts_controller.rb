@@ -14,15 +14,27 @@ class CartsController < ApplicationController
       return
     end
 
-    unless product.in_stock && product.stock_quantity > 0
+    unless product.in_stock
       redirect_back fallback_location: catalog_path, alert: "Товара нет в наличии"
       return
     end
 
+    available = product.stock_for_size(size)
+    if available <= 0
+      redirect_back fallback_location: catalog_path, alert: "Размера «#{size}» нет в наличии"
+      return
+    end
+
     cart_item = @cart.cart_items.find_by(product_id: product.id, size: size)
+    current_qty = cart_item ? cart_item.quantity : 0
+
+    if current_qty >= available
+      redirect_back fallback_location: catalog_path, alert: "Недостаточно товара на складе (доступно: #{available} шт.)"
+      return
+    end
 
     if cart_item
-      cart_item.update!(quantity: cart_item.quantity + 1)
+      cart_item.update!(quantity: current_qty + 1)
     else
       @cart.cart_items.create!(product: product, size: size, quantity: 1)
     end
@@ -34,6 +46,12 @@ class CartsController < ApplicationController
     @cart = current_cart
     cart_item = @cart.cart_items.find(params[:id])
     quantity = params[:quantity].to_i
+    available = cart_item.product.stock_for_size(cart_item.size)
+
+    if quantity > available
+      redirect_to cart_path, alert: "Недостаточно товара на складе (доступно: #{available} шт.)"
+      return
+    end
 
     if quantity > 0
       cart_item.update!(quantity: quantity)

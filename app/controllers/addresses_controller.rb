@@ -4,7 +4,7 @@ class AddressesController < ApplicationController
 
   def index
     @addresses = current_user.addresses.order(is_default: :desc, created_at: :desc)
-    @address = Address.new
+    @address = Address.new(full_name: [current_user.first_name, current_user.last_name].compact.join(" "))
   end
 
   def create

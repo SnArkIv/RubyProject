@@ -13,6 +13,7 @@ class Admin::ProductsController < Admin::BaseController
   end
 
   def create
+    compute_stock_from_sizes
     @product = Product.new(product_params)
     if @product.save
       attach_images
@@ -31,6 +32,7 @@ class Admin::ProductsController < Admin::BaseController
   end
 
   def update
+    compute_stock_from_sizes
     @product = Product.find(params[:id])
     if @product.update(product_params)
       attach_images
@@ -69,5 +71,14 @@ class Admin::ProductsController < Admin::BaseController
         @product.images.attach(img)
       end
     end
+  end
+
+  def compute_stock_from_sizes
+    by_size = params.dig(:product, :stock_by_size)
+    return if by_size.blank?
+    by_size = by_size.transform_values(&:to_i)
+    total = by_size.values.sum
+    params[:product][:stock_quantity] = total
+    params[:product][:in_stock] = total > 0
   end
 end

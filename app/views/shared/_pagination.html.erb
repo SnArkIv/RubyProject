@@ -2,7 +2,7 @@
 <% total_pages = defined?(pagy) ? pagy.pages : 1 %>
 <% url_builder = defined?(pagy_url_for) ? ->(p) { pagy_url_for(pagy, p) } : ->(p) { "?page=#{p}" } %>
 
-<div class="flex items-center justify-center gap-1.5 mt-6">
+<div class="flex items-center justify-center gap-1.5 mt-6 overflow-x-auto py-2">
   <% if page_param > 1 %>
     <a href="<%= url_builder.call(page_param - 1) %>"
        class="px-3 py-1.5 rounded text-sm border border-gray-300 bg-white text-gray-700 no-underline hover:bg-gray-100 transition">&laquo;</a>

@@ -4,6 +4,12 @@ class ProfilesController < ApplicationController
   def show
     @user = current_user
     @orders = @user.orders.includes(:order_items).order(created_at: :desc).limit(5)
+    @unreviewed_products = Product
+      .joins(order_items: :order)
+      .where(order_items: { orders: { user_id: @user.id, status: :delivered } })
+      .where.not(id: @user.reviews.select(:product_id))
+      .distinct
+      .limit(10)
   end
 
   def edit

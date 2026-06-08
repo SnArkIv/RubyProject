@@ -1,13 +1,19 @@
 <% content_for :title, "Корзина — Магазин" %>
 
-<h1 class="mt-0">Корзина</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">Корзина</h1>
 
 <% if @cart_items.any? %>
-  <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
+  <%= form_with url: new_order_path, method: :get, id: "checkout-form", style: "display: none", local: true do %>
+    <%= hidden_field_tag :from_cart, "1" %>
+  <% end %>
+
+  <!-- Desktop table -->
+  <div class="hidden md:block bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] overflow-hidden">
     <div class="overflow-x-auto">
-      <table class="w-full text-left border-collapse">
+      <table class="w-full text-left border-collapse" id="cart-table">
         <thead>
           <tr class="border-b border-[#eee]">
+            <th class="p-4 font-semibold w-12"><%= check_box_tag nil, nil, true, id: "select-all", onclick: "document.querySelectorAll('input[name=\\'cart_item_ids[]\\']').forEach(c => { c.checked = this.checked; c.dispatchEvent(new Event('change')) })" %></th>
             <th class="p-4 font-semibold">Товар</th>
             <th class="p-4 font-semibold">Размер</th>
             <th class="p-4 font-semibold">Цена</th>
@@ -18,15 +24,20 @@
         </thead>
         <tbody>
           <% @cart_items.each do |item| %>
-            <tr class="border-b border-[#eee] last:border-b-0">
+            <tr class="border-b border-[#eee] last:border-b-0" data-price="<%= item.product.final_price * item.quantity %>">
+              <td class="p-4"><%= check_box_tag "cart_item_ids[]", item.id, true, id: "item_#{item.id}", class: "cart-checkbox", onchange: "updateCartTotal()" %></td>
               <td class="p-4">
                 <div class="flex items-center gap-3">
                   <% if item.product.images.attached? %>
-                    <%= active_storage_image_tag item.product.images.first, resize_to_limit: [64, 64], alt: item.product.name, class: "w-16 h-16 object-cover rounded" %>
+                    <%= link_to product_path(item.product) do %>
+                      <%= active_storage_image_tag item.product.images.first, resize_to_limit: [64, 64], alt: item.product.name, class: "w-16 h-16 object-cover rounded" %>
+                    <% end %>
                   <% else %>
-                    <%= image_tag "https://placehold.co/64x64/ddd/333?text=#{CGI.escape(item.product.name[0..2])}", alt: item.product.name, class: "w-16 h-16 object-cover rounded" %>
+                    <%= link_to product_path(item.product) do %>
+                      <%= image_tag "https://placehold.co/64x64/ddd/333?text=#{CGI.escape(item.product.name[0..2])}", alt: item.product.name, class: "w-16 h-16 object-cover rounded" %>
+                    <% end %>
                   <% end %>
-                  <span class="font-medium"><%= item.product.name %></span>
+                  <%= link_to item.product.name, product_path(item.product), class: "font-medium text-accent no-underline hover:underline" %>
                 </div>
               </td>
               <td class="p-4"><%= item.size %></td>
@@ -39,26 +50,89 @@
                 <% end %>
               </td>
               <td class="p-4">
-                <%= form_with url: update_item_cart_path(item), method: :patch, local: true, class: "flex items-center gap-2", data: { controller: "auto-submit" } do %>
-                  <%= number_field_tag :quantity, item.quantity, min: 1,
-                        class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center",
-                        data: { action: "change->auto-submit#submit" } %>
-                <% end %>
+                <turbo-frame id="qty_<%= item.id %>">
+                  <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", data: { controller: "auto-submit" } do %>
+                    <%= number_field_tag :quantity, item.quantity, min: 1,
+                          class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center",
+                          data: { action: "change->auto-submit#submit" } %>
+                  <% end %>
+                </turbo-frame>
               </td>
               <td class="p-4 font-bold"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</td>
               <td class="p-4">
-                <%= button_to "Удалить", remove_item_cart_path(item), method: :delete,
-                    class: "bg-accent text-white px-3 py-1 rounded text-sm cursor-pointer border-none hover:brightness-110" %>
+                <div class="flex items-center gap-1">
+                  <%= button_to "Купить сейчас", orders_path, method: :post,
+                      params: { single_item_id: item.id, order: { shipping_address: "Самовывоз", delivery_method: "pickup", payment_method: "cash" } },
+                      class: "text-xs bg-[#1a1a1a] text-white px-2 py-1 rounded cursor-pointer border-none hover:brightness-110",
+                      data: { confirm: "Оформить заказ на этот товар?" } %>
+                  <%= button_to "Удалить", remove_item_cart_path(item), method: :delete,
+                      class: "bg-accent text-white px-3 py-1 rounded text-sm cursor-pointer border-none hover:brightness-110" %>
+                </div>
               </td>
             </tr>
           <% end %>
         </tbody>
       </table>
     </div>
-    <div class="p-4 border-t border-[#eee] flex flex-wrap items-center justify-between gap-3">
-      <span class="text-lg font-bold">Общая сумма: <%= format("%.0f", @cart.total_amount) %> ₽</span>
-      <%= link_to "Оформить заказ", new_order_path,
-          class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline font-semibold hover:brightness-105" %>
+  </div>
+
+  <!-- Mobile cards -->
+  <div class="md:hidden space-y-3" id="cart-mobile">
+    <% @cart_items.each do |item| %>
+      <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 cart-mobile-card" data-price="<%= item.product.final_price * item.quantity %>">
+        <div class="flex items-start gap-3 mb-3">
+          <%= check_box_tag "cart_item_ids[]", item.id, true, id: "mobile_item_#{item.id}", class: "cart-checkbox mt-1", onchange: "updateCartTotal()" %>
+          <% if item.product.images.attached? %>
+            <%= link_to product_path(item.product) do %>
+              <%= active_storage_image_tag item.product.images.first, resize_to_limit: [64, 64], alt: item.product.name, class: "w-16 h-16 object-cover rounded shrink-0" %>
+            <% end %>
+          <% else %>
+            <%= link_to product_path(item.product) do %>
+              <%= image_tag "https://placehold.co/64x64/ddd/333?text=#{CGI.escape(item.product.name[0..2])}", alt: item.product.name, class: "w-16 h-16 object-cover rounded shrink-0" %>
+            <% end %>
+          <% end %>
+          <div class="flex-1 min-w-0">
+            <%= link_to item.product.name, product_path(item.product), class: "font-medium text-accent no-underline hover:underline text-sm line-clamp-2" %>
+            <p class="text-xs text-[#888] mt-0.5">Размер: <%= item.size %></p>
+            <div class="mt-1">
+              <% if item.product.on_sale? %>
+                <span class="line-through text-[#888] text-xs"><%= item.product.display_price %> ₽</span>
+                <span class="font-bold text-sm"><%= item.product.display_final_price %> ₽</span>
+              <% else %>
+                <span class="font-bold text-sm"><%= item.product.display_price %> ₽</span>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        <div class="flex items-center justify-between gap-3">
+          <turbo-frame id="mobile_qty_<%= item.id %>">
+            <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", data: { controller: "auto-submit" } do %>
+              <%= number_field_tag :quantity, item.quantity, min: 1,
+                    class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center text-sm",
+                    data: { action: "change->auto-submit#submit" } %>
+            <% end %>
+          </turbo-frame>
+          <div class="font-bold text-sm"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</div>
+        </div>
+        <div class="flex items-center gap-2 mt-3">
+          <%= button_to "Купить сейчас", orders_path, method: :post,
+              params: { single_item_id: item.id, order: { shipping_address: "Самовывоз", delivery_method: "pickup", payment_method: "cash" } },
+              class: "flex-1 text-xs bg-[#1a1a1a] text-white px-2 py-2 rounded cursor-pointer border-none hover:brightness-110",
+              data: { confirm: "Оформить заказ на этот товар?" } %>
+          <%= button_to "Удалить", remove_item_cart_path(item), method: :delete,
+              class: "bg-accent text-white px-3 py-2 rounded text-xs cursor-pointer border-none hover:brightness-110" %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <div class="mt-4 bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 flex flex-wrap items-center justify-between gap-3">
+    <span class="text-lg font-bold">Общая сумма: <span id="cart-total"><%= format("%.0f", @cart_items.sum { |item| item.product.final_price * item.quantity }) %></span> ₽</span>
+    <div class="flex items-center gap-3">
+      <span class="text-sm text-[#888]" id="selected-count">Выбрано: <%= @cart_items.count %></span>
+      <button type="button" id="checkout-btn"
+          class="bg-accent text-white px-6 py-3 rounded-md font-semibold border-none hover:brightness-105 cursor-pointer"
+          onclick="checkout()">Оформить заказ</button>
     </div>
   </div>
 <% else %>
@@ -68,3 +142,47 @@
         class: "inline-block bg-accent text-white px-6 py-3 rounded-md no-underline font-semibold hover:brightness-105" %>
   </div>
 <% end %>
+
+<script>
+function updateCartTotal() {
+  let total = 0;
+  let count = 0;
+  document.querySelectorAll('.cart-checkbox:checked').forEach(cb => {
+    const row = cb.closest('tr') || cb.closest('.cart-mobile-card');
+    if (!row) return;
+    const price = parseFloat(row.dataset.price) || 0;
+    total += price;
+    count++;
+  });
+  document.getElementById('cart-total').textContent = total.toFixed(0);
+  document.getElementById('selected-count').textContent = 'Выбрано: ' + count;
+  var btn = document.getElementById('checkout-btn');
+  if (!btn) return;
+  if (count === 0) {
+    btn.disabled = true;
+    btn.classList.add('bg-gray-400', 'cursor-not-allowed', 'hover:brightness-100');
+    btn.classList.remove('bg-accent', 'hover:brightness-105', 'cursor-pointer');
+  } else {
+    btn.disabled = false;
+    btn.classList.remove('bg-gray-400', 'cursor-not-allowed', 'hover:brightness-100');
+    btn.classList.add('bg-accent', 'hover:brightness-105', 'cursor-pointer');
+  }
+}
+
+function checkout() {
+  var btn = document.getElementById('checkout-btn');
+  if (btn.disabled) return;
+  var form = document.getElementById('checkout-form');
+  form.innerHTML = '';
+  document.querySelectorAll('.cart-checkbox:checked').forEach(function(cb) {
+    var h = document.createElement('input');
+    h.type = 'hidden';
+    h.name = 'cart_item_ids[]';
+    h.value = cb.value;
+    form.appendChild(h);
+  });
+  form.submit();
+}
+
+updateCartTotal();
+</script>

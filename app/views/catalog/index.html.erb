@@ -1,23 +1,31 @@
 <% content_for :title, "Каталог — Магазин" %>
 
-<h1 class="mt-0">Каталог</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">Каталог</h1>
 
 <div class="flex flex-col lg:flex-row gap-6">
   <!-- Filters sidebar -->
   <aside class="w-full lg:w-64 shrink-0">
-    <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 space-y-4">
+    <!-- Mobile filters toggle -->
+    <button type="button"
+        class="lg:hidden w-full flex items-center justify-between bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-3 mb-2 font-medium text-sm cursor-pointer border-none"
+        onclick="var f=document.getElementById('filters-form'); f.classList.toggle('hidden'); this.querySelector('svg').classList.toggle('rotate-180')">
+      <span>Фильтры</span>
+      <svg class="w-4 h-4 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+    </button>
+
+    <div id="filters-form" class="hidden lg:block bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 space-y-4">
       <%= form_with url: catalog_path, method: :get, local: true, class: "space-y-4", data: { controller: "auto-submit" } do %>
         <%= hidden_field_tag :sort, @query[:sort] if @query[:sort].present? %>
 
         <div>
-          <label class="block font-medium mb-1">Поиск</label>
+          <label class="block font-medium mb-1 text-sm">Поиск</label>
           <%= text_field_tag :q, @query[:q], placeholder: "Название или артикул",
-                class: "w-full px-3 py-2 rounded border border-[#999] bg-white",
+                class: "w-full px-3 py-2 rounded border border-[#999] bg-white text-sm",
                 data: { action: "input->auto-submit#debounce" } %>
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Категория</label>
+          <label class="block font-medium mb-1 text-sm">Категория</label>
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @categories.each do |cat| %>
               <label class="flex items-center gap-2 text-sm">
@@ -29,7 +37,7 @@
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Бренд</label>
+          <label class="block font-medium mb-1 text-sm">Бренд</label>
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @brands.each do |br| %>
               <label class="flex items-center gap-2 text-sm">
@@ -41,7 +49,7 @@
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Размер</label>
+          <label class="block font-medium mb-1 text-sm">Размер</label>
           <div class="flex flex-wrap gap-2">
             <% @sizes.each do |sz| %>
               <label class="flex items-center gap-1 text-sm border border-[#ccc] rounded px-2 py-1 cursor-pointer has-[:checked]:bg-accent has-[:checked]:text-white has-[:checked]:border-accent">
@@ -53,7 +61,7 @@
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Цвет</label>
+          <label class="block font-medium mb-1 text-sm">Цвет</label>
           <div class="space-y-1 max-h-40 overflow-y-auto">
             <% @colors.each do |col| %>
               <label class="flex items-center gap-2 text-sm">
@@ -65,14 +73,14 @@
         </div>
 
         <div>
-          <label class="block font-medium mb-1">Цена</label>
+          <label class="block font-medium mb-1 text-sm">Цена</label>
           <div class="flex items-center gap-2">
             <%= number_field_tag :price_min, @query[:price_min], placeholder: "От",
-                  class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white",
+                  class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white text-sm",
                   data: { action: "change->auto-submit#submit" } %>
-            <span>—</span>
+            <span class="text-sm">—</span>
             <%= number_field_tag :price_max, @query[:price_max], placeholder: "До",
-                  class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white",
+                  class: "w-full px-2 py-1.5 rounded border border-[#999] bg-white text-sm",
                   data: { action: "change->auto-submit#submit" } %>
           </div>
         </div>
@@ -116,7 +124,7 @@
       <% end %>
     </div>
 
-    <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
+    <div class="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 sm:gap-5">
       <% @products.each do |product| %>
         <%= render "catalog/product_card", product: product, query: @query %>
       <% end %>

@@ -1,8 +1,8 @@
 <% content_for :title, "Редактирование адреса — Магазин" %>
 
-<h1 class="mt-0">Редактирование адреса</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">Редактирование адреса</h1>
 
-<div class="max-w-[640px] bg-white rounded-lg p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
+<div class="max-w-[640px] bg-white rounded-lg p-4 md:p-5 shadow-[0_2px_8px_rgba(0,0,0,0.06)]">
   <%= form_with model: @address, url: address_path(@address), method: :patch, local: true do |f| %>
     <% if @address.errors.any? %>
       <div class="bg-[#f8d7da] text-[#721c24] px-4 py-3 rounded mb-4">

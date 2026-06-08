@@ -1,15 +1,15 @@
 <% content_for :title, "Избранное — Магазин" %>
 
-<h1 class="mt-0">Избранное</h1>
+<h1 class="mt-0 text-2xl md:text-3xl">Избранное</h1>
 
 <% if @favorites.any? %>
-  <div class="grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-5">
+  <div class="grid grid-cols-2 sm:grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3 sm:gap-5">
     <% @favorites.each do |favorite| %>
       <% product = favorite.product %>
       <div class="relative">
         <%= render "catalog/product_card", product: product, query: {} %>
         <%= button_to favorite_path(product), method: :delete,
-            class: "absolute top-2 right-2 bg-white/90 text-accent border-none rounded-full w-8 h-8 flex items-center justify-center cursor-pointer shadow hover:bg-white" do %>
+            class: "absolute top-2 right-2 bg-white/90 text-accent border-none rounded-full w-7 h-7 md:w-8 md:h-8 flex items-center justify-center cursor-pointer shadow hover:bg-white text-sm md:text-base" do %>
           ✕
         <% end %>
       </div>

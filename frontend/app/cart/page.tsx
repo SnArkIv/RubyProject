@@ -32,9 +32,6 @@ interface CartData {
 export default function CartPage() {
   const router = useRouter();
   const [data, setData] = useState<CartData | null>(null);
-  const [promoCode, setPromoCode] = useState('');
-  const [promoDiscount, setPromoDiscount] = useState(0);
-  const [promoError, setPromoError] = useState('');
   const { refreshCart } = useCart();
 
   const loadCart = () => api.get('/cart').then(setData);
@@ -69,22 +66,9 @@ export default function CartPage() {
     }
   };
 
-  const applyPromo = async () => {
-    if (!promoCode.trim()) return;
-    setPromoError('');
-    try {
-      const result = await api.post('/promo_codes/validate', { code: promoCode });
-      setPromoDiscount(result.discount);
-    } catch (err: any) {
-      setPromoError(err.message || 'Промокод не найден');
-      setPromoDiscount(0);
-    }
-  };
-
   if (!data) return <p>Загрузка...</p>;
 
   const { items, total_amount } = data.cart;
-  const finalTotal = total_amount * (1 - promoDiscount / 100);
 
   return (
     <div>
@@ -136,28 +120,12 @@ export default function CartPage() {
             </table>
           </div>
 
-          <div className="mt-4 grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4">
-            <div className="bg-white rounded-lg p-4 shadow">
-              <h3 className="font-semibold mb-2">Промокод</h3>
-              <div className="flex gap-2">
-                <input value={promoCode} onChange={(e) => setPromoCode(e.target.value)} placeholder="Введите код" className="flex-1 px-3 py-2 border rounded text-sm" />
-                <button onClick={applyPromo} className="bg-dark text-white px-3 py-2 rounded text-sm">Применить</button>
-              </div>
-              {promoError && <p className="text-red-500 text-xs mt-1">{promoError}</p>}
-              {promoDiscount > 0 && <p className="text-green-600 text-xs mt-1">Скидка {promoDiscount}%</p>}
-            </div>
-
-            <div className="bg-white rounded-lg p-4 shadow">
+          <div className="mt-4 flex justify-end">
+            <div className="bg-white rounded-lg p-4 shadow w-full max-w-xs">
               <div className="space-y-1">
-                {promoDiscount > 0 && (
-                  <div className="flex justify-between text-sm text-green-600">
-                    <span>Скидка ({promoDiscount}%)</span>
-                    <span>-{Math.round(total_amount * promoDiscount / 100)} ₽</span>
-                  </div>
-                )}
                 <div className="flex justify-between text-lg font-bold">
                   <span>Итого:</span>
-                  <span>{Math.round(finalTotal)} ₽</span>
+                  <span>{Math.round(total_amount)} ₽</span>
                 </div>
               </div>
               <Link href="/orders/new" className="mt-3 block text-center bg-accent text-white px-6 py-3 rounded-md font-semibold">Оформить заказ</Link>

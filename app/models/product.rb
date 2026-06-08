@@ -89,6 +89,16 @@ class Product < ApplicationRecord
     update_column(:average_rating, avg.round(2))
   end
 
+  def in_stock
+    return self[:in_stock] if stock_by_size.blank? || stock_by_size.empty?
+    stock_by_size.values.sum(&:to_i) > 0
+  end
+
+  def stock_quantity
+    return self[:stock_quantity] if stock_by_size.blank? || stock_by_size.empty?
+    stock_by_size.values.sum(&:to_i)
+  end
+
   def low_stock?
     in_stock? && stock_quantity > 0 && stock_quantity < 50
   end
@@ -104,11 +114,6 @@ class Product < ApplicationRecord
 
   def in_stock_for_size?(size)
     in_stock? && stock_for_size(size) > 0
-  end
-
-  def total_available_stock
-    return stock_quantity if stock_by_size.blank? || stock_by_size.empty?
-    stock_by_size.values.sum(&:to_i)
   end
 
   private

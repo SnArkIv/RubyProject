@@ -1,5 +1,5 @@
 <%= link_to product_path(product, **query.compact_blank.symbolize_keys),
-            class: "group bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] no-underline text-inherit block relative" do %>
+            class: "group bg-white rounded-lg overflow-hidden shadow-[0_2px_8px_rgba(0,0,0,0.08)] no-underline text-inherit block relative #{'opacity-50 grayscale' unless product.in_stock? && product.stock_quantity > 0}" do %>
   <div class="relative aspect-square bg-[#e0e0e0] overflow-hidden">
     <% if product.on_sale? %>
       <span class="absolute top-2 left-2 bg-accent text-white text-[0.7rem] font-extrabold px-1.5 py-0.5 rounded z-[2]">-<%= product.discount %>%</span>
@@ -14,6 +14,11 @@
         <span><%= sz %></span>
       <% end %>
     </div>
+    <% unless product.in_stock? && product.stock_quantity > 0 %>
+      <div class="absolute inset-0 bg-black/40 flex items-center justify-center z-[3]">
+        <span class="bg-accent text-white text-xs font-bold px-2 py-1 rounded">Нет в наличии</span>
+      </div>
+    <% end %>
   </div>
   <div class="p-3">
     <h2 class="mt-0 mb-2 text-[0.95rem]"><%= product.name %></h2>

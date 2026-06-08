@@ -13,16 +13,38 @@
     <header class="bg-dark text-on-dark px-4 py-3">
       <div class="max-w-[1400px] mx-auto flex items-center justify-between">
         <%= link_to "← На сайт", root_path, class: "text-on-dark no-underline hover:underline text-sm" %>
-        <span class="font-bold">Админ-панель</span>
-        <div class="flex items-center gap-3 text-sm">
+        <span class="font-bold text-sm md:text-base">Админ-панель</span>
+        <div class="hidden md:flex items-center gap-3 text-sm">
           <span><%= current_user.email %></span>
           <%= link_to "Выйти", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline" %>
+        </div>
+        <!-- Mobile admin burger -->
+        <button type="button"
+            class="md:hidden flex items-center justify-center w-10 h-10 bg-white rounded-lg cursor-pointer border-none shadow-sm"
+            onclick="var p=document.getElementById('admin-mobile-menu'); p.classList.toggle('hidden'); p.classList.toggle('flex');"
+            aria-label="Открыть меню">
+          <svg width="20" height="14" viewBox="0 0 20 14" fill="none" xmlns="http://www.w3.org/2000/svg" class="text-[#1a1a1a]">
+            <path d="M1 1H19M1 7H19M1 13H19" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+        </button>
+      </div>
+      <!-- Mobile admin menu -->
+      <div id="admin-mobile-menu" class="hidden flex-col gap-2 mt-3 pt-3 border-t border-white/20 md:hidden text-sm">
+        <%= link_to "Обзор", admin_root_path, class: "text-on-dark no-underline hover:underline py-1" %>
+        <%= link_to "Товары", admin_products_path, class: "text-on-dark no-underline hover:underline py-1" %>
+        <%= link_to "Категории", admin_categories_path, class: "text-on-dark no-underline hover:underline py-1" %>
+        <%= link_to "Бренды", admin_brands_path, class: "text-on-dark no-underline hover:underline py-1" %>
+        <%= link_to "Заказы", admin_orders_path, class: "text-on-dark no-underline hover:underline py-1" %>
+        <%= link_to "Пользователи", admin_users_path, class: "text-on-dark no-underline hover:underline py-1" %>
+        <div class="pt-2 border-t border-white/20 mt-1">
+          <span class="block text-white/70 text-xs"><%= current_user.email %></span>
+          <%= link_to "Выйти", destroy_user_session_path, data: { turbo_method: :delete }, class: "text-on-dark no-underline hover:underline py-1 text-sm" %>
         </div>
       </div>
     </header>
 
-    <div class="flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full flex-1 px-4 py-6 gap-6">
-      <aside class="w-full lg:w-56 shrink-0">
+    <div class="flex flex-col lg:flex-row max-w-[1400px] mx-auto w-full flex-1 px-4 py-4 md:py-6 gap-4 md:gap-6">
+      <aside class="hidden lg:block w-full lg:w-56 shrink-0">
         <nav class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-3 space-y-1">
           <%= link_to "Обзор", admin_root_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'dashboard'}" %>
           <%= link_to "Товары", admin_products_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'products'}" %>
@@ -30,13 +52,12 @@
           <%= link_to "Бренды", admin_brands_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'brands'}" %>
           <%= link_to "Заказы", admin_orders_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'orders'}" %>
           <%= link_to "Пользователи", admin_users_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'users'}" %>
-          <%= link_to "Промокоды", admin_promo_codes_path, class: "block px-3 py-2 rounded no-underline text-inherit hover:bg-page #{'bg-page font-semibold' if controller_name == 'promo_codes'}" %>
         </nav>
       </aside>
 
       <main class="flex-1 min-w-0">
         <% flash.each do |type, msg| %>
-          <div class="mb-4 px-4 py-3 rounded <%= type == 'notice' ? 'bg-[#d4edda] text-[#155724]' : 'bg-[#f8d7da] text-[#721c24]' %>"><%= msg %></div>
+          <div class="mb-4 px-4 py-3 rounded text-sm md:text-base <%= type == 'notice' ? 'bg-[#d4edda] text-[#155724]' : 'bg-[#f8d7da] text-[#721c24]' %>"><%= msg %></div>
         <% end %>
         <%= yield %>
       </main>

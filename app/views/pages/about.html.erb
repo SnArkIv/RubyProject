@@ -20,7 +20,7 @@
       <span class="text-[#e63946]">говорит за вас</span>
     </h1>
     <p class="text-lg md:text-xl text-white/70 mb-8 max-w-2xl mx-auto">
-      Натуральные ткани, современный крой, честные цены. 
+      Натуральные ткани, современный крой, честные цены.
       Выбирайте стиль, который подчеркивает вашу индивидуальность.
     </p>
     <div class="flex flex-wrap items-center justify-center gap-4">
@@ -61,14 +61,39 @@
     <h2 class="text-2xl font-bold mb-8 text-center">Популярные категории</h2>
     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
       <% @categories.each do |cat| %>
+        <%
+          bg_colors = ['#1a1a1a', '#2d1b1b', '#1b2d1b', '#1b1b2d', '#2d2d1b', '#1b2d2d']
+          icons = {
+            'платья' => 'M12 2L8 6v4l-4 4v8h16v-8l-4-4V6l-4-4z',
+            'рубашки' => 'M6 2h12l2 6-4 4v10H8V12L4 8l2-6z',
+            'брюки' => 'M6 2h12v8l-4 12h-4L6 10V2z',
+            'куртки' => 'M4 4h16v6l-2 12H6L4 10V4z',
+            'аксессуары' => 'M12 2a4 4 0 00-4 4v2H4v12h16V8h-4V6a4 4 0 00-4-4z',
+            'юбки' => 'M8 2h8l4 8H4l4-8zM4 10h16v12H4V10z',
+            'обувь' => 'M4 12h16l-2 10H6L4 12z',
+          }
+          icon_path = icons.find { |key, _| cat.name.downcase.include?(key) }&.last || 'M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5'
+          bg_color = bg_colors[cat.id % bg_colors.length]
+        %>
         <%= link_to catalog_path(category_id: cat.id),
-            class: "group relative bg-white rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition no-underline block aspect-[4/3]" do %>
-          <div class="absolute inset-0 bg-[#1a1a1a] group-hover:bg-[#e63946] transition-colors duration-300"></div>
+            class: "group relative rounded-2xl overflow-hidden shadow-sm hover:shadow-lg transition no-underline block aspect-[4/3]" do %>
+          <div class="absolute inset-0" style="background-color: <%= bg_color %>;">
+            <div class="absolute inset-0 bg-gradient-to-br from-white/5 to-transparent"></div>
+          </div>
+          <div class="absolute inset-0 opacity-[0.07] flex items-center justify-center p-8">
+            <svg viewBox="0 0 24 24" fill="white" class="w-full h-full">
+              <path d="<%= icon_path %>"/>
+            </svg>
+          </div>
+          <div class="absolute inset-0 opacity-[0.04]">
+            <div class="w-full h-full" style="background-image: radial-gradient(circle at <%= 20 + (cat.id * 30) % 60 %>% <%= 30 + (cat.id * 20) % 50 %>%, white 1px, transparent 1px); background-size: 30px 30px"></div>
+          </div>
+          <div class="absolute inset-0 group-hover:bg-accent transition-colors duration-300"></div>
           <div class="relative h-full flex flex-col items-center justify-center text-white p-6">
             <h3 class="text-2xl font-bold mb-2"><%= cat.name %></h3>
             <p class="text-white/70 text-sm"><%= cat.products.published.count %> товаров</p>
             <span class="mt-4 inline-flex items-center text-sm font-medium">
-              Смотреть 
+              Смотреть
               <svg class="w-4 h-4 ml-1 group-hover:translate-x-1 transition" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
             </span>
           </div>
@@ -88,7 +113,7 @@
       </div>
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <% @sale_products.each do |product| %>
-          <%= link_to product_path(product), class: "group block no-underline" do %>
+          <%= link_to product_path(product), class: "group block no-underline #{'opacity-50 grayscale' unless product.in_stock? && product.stock_quantity > 0}" do %>
             <div class="bg-[#f8f8f8] rounded-xl overflow-hidden aspect-square mb-3 relative">
               <% if product.images.attached? %>
                 <%= active_storage_image_tag product.images.first, resize_to_limit: [400, 400], alt: product.name, class: "w-full h-full object-cover group-hover:scale-105 transition duration-300" %>
@@ -96,6 +121,11 @@
                 <div class="w-full h-full flex items-center justify-center text-gray-400 text-sm">Нет фото</div>
               <% end %>
               <span class="absolute top-3 left-3 bg-[#e63946] text-white text-xs font-bold px-2 py-1 rounded">-<%= product.discount %>%</span>
+              <% unless product.in_stock? && product.stock_quantity > 0 %>
+                <div class="absolute inset-0 bg-black/40 flex items-center justify-center rounded-xl">
+                  <span class="bg-[#e63946] text-white text-xs font-bold px-2 py-1 rounded">Нет в наличии</span>
+                </div>
+              <% end %>
             </div>
             <h3 class="text-sm font-medium text-[#1a1a1a] truncate group-hover:text-[#e63946] transition"><%= product.name %></h3>
             <div class="flex items-center gap-2 mt-1">
@@ -108,53 +138,3 @@
     </div>
   </section>
 <% end %>
-
-<!-- About -->
-<section id="about" class="py-16 bg-[#1a1a1a] text-white">
-  <div class="max-w-6xl mx-auto px-4">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
-      <div>
-        <h2 class="text-3xl font-bold mb-4">О бренде Модница</h2>
-        <p class="text-white/70 mb-4 leading-relaxed">
-          Мы создаём одежду для тех, кто ценит качество и стиль. Каждая вещь проходит тщательный контроль: 
-          от выбора ткани до финальной примерки. Наша цель — чтобы вы чувствовали себя уверенно каждый день.
-        </p>
-        <ul class="space-y-2 text-white/70">
-          <li class="flex items-center gap-2"><span class="text-[#e63946]">✓</span> Только натуральные ткани</li>
-          <li class="flex items-center gap-2"><span class="text-[#e63946]">✓</span> Прозрачные условия возврата 14 дней</li>
-          <li class="flex items-center gap-2"><span class="text-[#e63946]">✓</span> Собственное производство в России</li>
-        </ul>
-      </div>
-      <div class="bg-[#252525] rounded-2xl p-8">
-        <div class="grid grid-cols-2 gap-6">
-          <div class="text-center">
-            <div class="text-3xl font-bold text-[#e63946]">12K+</div>
-            <div class="text-white/60 text-sm mt-1">Довольных клиентов</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-[#e63946]">500+</div>
-            <div class="text-white/60 text-sm mt-1">Моделей в каталоге</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-[#e63946]">4.8</div>
-            <div class="text-white/60 text-sm mt-1">Средняя оценка</div>
-          </div>
-          <div class="text-center">
-            <div class="text-3xl font-bold text-[#e63946]">2-5</div>
-            <div class="text-white/60 text-sm mt-1">Дней доставка</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- CTA -->
-<section class="py-16 bg-[#e63946] text-white text-center">
-  <div class="max-w-3xl mx-auto px-4">
-    <h2 class="text-3xl font-bold mb-4">Готовы обновить гардероб?</h2>
-    <p class="text-white/80 mb-8">Присоединяйтесь к тысячам довольных клиентов. Первая покупка со скидкой 10% по промокоду <strong>НАЧАЛО</strong>.</p>
-    <%= link_to "Перейти в каталог", catalog_path,
-        class: "inline-block bg-white text-[#e63946] px-8 py-3 rounded-md font-semibold no-underline hover:bg-white/90 transition" %>
-  </div>
-</section>
