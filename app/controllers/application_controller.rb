@@ -5,12 +5,19 @@ class ApplicationController < ActionController::Base
 
   helper_method :current_cart
 
+  rescue_from ActiveRecord::RecordNotFound, with: :not_found
+
   def pagy_url_for(pagy, page, absolute: false, html_escaped: false)
     query_params = request.query_parameters.merge(page: page)
     "#{request.path}?#{query_params.to_query}"
   end
 
   private
+
+  def not_found
+    flash[:alert] = "Товар не найден. Возможно, он был удалён или ID изменился."
+    redirect_to catalog_path
+  end
 
   def current_cart
     return @current_cart if defined?(@current_cart)
