@@ -413,12 +413,32 @@ ITEMS = [
 ].freeze
 
 ITEMS.each do |attrs|
+  stock_by_size = if attrs[:sizes].present? && attrs[:sizes].any? && attrs[:stock_quantity] > 0
+    total = attrs[:stock_quantity]
+    count = attrs[:sizes].size
+    base = total / count
+    remainder = total % count
+    result = {}
+    attrs[:sizes].each_with_index do |sz, i|
+      result[sz] = base + (i < remainder ? 1 : 0)
+    end
+    # Demo: make one random size low stock (< 10) if enough total
+    if total > 20 && result.size > 1
+      low_sz = result.keys.sample
+      result[low_sz] = rand(3..8)
+    end
+    result
+  else
+    {}
+  end
+
   Product.create!(
     name: attrs[:name],
     description: attrs[:description],
     price: attrs[:price],
     discount: attrs[:discount],
     stock_quantity: attrs[:stock_quantity],
+    stock_by_size: stock_by_size,
     sku: attrs[:sku],
     category_id: attrs[:category].id,
     brand_id: attrs[:brand].id,

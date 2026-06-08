@@ -116,6 +116,13 @@ class Product < ApplicationRecord
     in_stock? && stock_for_size(size) > 0
   end
 
+  LOW_STOCK_THRESHOLD = 10
+
+  def low_stock_for_size?(size)
+    stock = stock_for_size(size)
+    stock > 0 && stock < LOW_STOCK_THRESHOLD
+  end
+
   private
 
   def auto_generate_sku
