@@ -24,7 +24,10 @@
         </thead>
         <tbody>
           <% @cart_items.each do |item| %>
-            <tr class="border-b border-[#eee] last:border-b-0" data-price="<%= item.product.final_price * item.quantity %>">
+            <tr class="border-b border-[#eee] last:border-b-0 cart-item-row"
+                data-item-id="<%= item.id %>"
+                data-unit-price="<%= item.product.final_price %>"
+                data-max-qty="<%= item.product.stock_for_size(item.size) %>">
               <td class="p-4"><%= check_box_tag "cart_item_ids[]", item.id, true, id: "item_#{item.id}", class: "cart-checkbox", onchange: "updateCartTotal()" %></td>
               <td class="p-4">
                 <div class="flex items-center gap-3">
@@ -50,13 +53,24 @@
                 <% end %>
               </td>
               <td class="p-4">
-                <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", local: true do %>
-                  <%= number_field_tag :quantity, item.quantity, min: 1,
-                        class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center",
-                        onchange: "this.form.submit()" %>
-                <% end %>
+                <div class="flex items-center gap-2">
+                  <button type="button"
+                      class="w-7 h-7 rounded border border-[#999] bg-white text-sm hover:bg-[#f0f0f0]"
+                      onclick="changeQtyDesktop('<%= item.id %>', -1)">−</button>
+                  <input type="number"
+                      class="qty-input w-12 px-1 py-1 rounded border border-[#999] bg-white text-center text-sm"
+                      value="<%= item.quantity %>" min="1"
+                      data-item-id="<%= item.id %>"
+                      onchange="updateQtyDesktop(this, this.value)">
+                  <button type="button"
+                      class="w-7 h-7 rounded border border-[#999] bg-white text-sm hover:bg-[#f0f0f0]"
+                      onclick="changeQtyDesktop('<%= item.id %>', 1)">+</button>
+                </div>
+                <div class="text-xs text-red-500 mt-1 min-h-[1rem]" id="desktop-msg-<%= item.id %>"></div>
               </td>
-              <td class="p-4 font-bold"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</td>
+              <td class="p-4 font-bold">
+                <span class="item-total"><%= format("%.0f", item.product.final_price * item.quantity) %></span> ₽
+              </td>
               <td class="p-4">
                 <div class="flex items-center gap-1">
                   <%= button_to "Купить сейчас", orders_path, method: :post,
@@ -77,7 +91,10 @@
   <!-- Mobile cards -->
   <div class="md:hidden space-y-3" id="cart-mobile">
     <% @cart_items.each do |item| %>
-      <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 cart-mobile-card" data-price="<%= item.product.final_price * item.quantity %>">
+      <div class="bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.06)] p-4 cart-mobile-card cart-item-row"
+           data-item-id="<%= item.id %>"
+           data-unit-price="<%= item.product.final_price %>"
+           data-max-qty="<%= item.product.stock_for_size(item.size) %>">
         <div class="flex items-start gap-3 mb-3">
           <%= check_box_tag "cart_item_ids[]", item.id, true, id: "mobile_item_#{item.id}", class: "cart-checkbox mt-1", onchange: "updateCartTotal()" %>
           <% if item.product.images.attached? %>
@@ -103,13 +120,24 @@
           </div>
         </div>
         <div class="flex items-center justify-between gap-3">
-          <%= form_with url: update_item_cart_path(item), method: :patch, class: "flex items-center gap-2", local: true do %>
-            <%= number_field_tag :quantity, item.quantity, min: 1,
-                  class: "w-16 px-2 py-1 rounded border border-[#999] bg-white text-center text-sm",
-                  onchange: "this.form.submit()" %>
-          <% end %>
-          <div class="font-bold text-sm"><%= format("%.0f", item.product.final_price * item.quantity) %> ₽</div>
+          <div class="flex items-center gap-2">
+            <button type="button"
+                class="w-7 h-7 rounded border border-[#999] bg-white text-sm hover:bg-[#f0f0f0]"
+                onclick="changeQtyMobile('<%= item.id %>', -1)">−</button>
+            <input type="number"
+                class="qty-input w-12 px-1 py-1 rounded border border-[#999] bg-white text-center text-sm"
+                value="<%= item.quantity %>" min="1"
+                data-item-id="<%= item.id %>"
+                onchange="updateQtyMobile(this, this.value)">
+            <button type="button"
+                class="w-7 h-7 rounded border border-[#999] bg-white text-sm hover:bg-[#f0f0f0]"
+                onclick="changeQtyMobile('<%= item.id %>', 1)">+</button>
+          </div>
+          <div class="font-bold text-sm">
+            <span class="item-total"><%= format("%.0f", item.product.final_price * item.quantity) %></span> ₽
+          </div>
         </div>
+        <div class="text-xs text-red-500 mt-1 min-h-[1rem]" id="mobile-msg-<%= item.id %>"></div>
         <div class="flex items-center gap-2 mt-3">
           <%= button_to "Купить сейчас", orders_path, method: :post,
               params: { single_item_id: item.id, order: { shipping_address: "Самовывоз", delivery_method: "pickup", payment_method: "cash" } },
@@ -140,45 +168,121 @@
 <% end %>
 
 <script>
-function updateCartTotal() {
-  let total = 0;
-  let count = 0;
-  document.querySelectorAll('.cart-checkbox:checked').forEach(cb => {
-    const row = cb.closest('tr') || cb.closest('.cart-mobile-card');
-    if (!row) return;
-    const price = parseFloat(row.dataset.price) || 0;
-    total += price;
-    count++;
-  });
-  document.getElementById('cart-total').textContent = total.toFixed(0);
-  document.getElementById('selected-count').textContent = 'Выбрано: ' + count;
-  var btn = document.getElementById('checkout-btn');
-  if (!btn) return;
-  if (count === 0) {
-    btn.disabled = true;
-    btn.classList.add('bg-gray-400', 'cursor-not-allowed', 'hover:brightness-100');
-    btn.classList.remove('bg-accent', 'hover:brightness-105', 'cursor-pointer');
-  } else {
-    btn.disabled = false;
-    btn.classList.remove('bg-gray-400', 'cursor-not-allowed', 'hover:brightness-100');
-    btn.classList.add('bg-accent', 'hover:brightness-105', 'cursor-pointer');
+  function findRow(id) {
+    return document.querySelector('.cart-item-row[data-item-id="' + id + '"]');
   }
-}
+  function getUnitPrice(row) {
+    return parseFloat(row.dataset.unitPrice) || 0;
+  }
+  function getMaxQty(row) {
+    return parseInt(row.dataset.maxQty, 10) || 999;
+  }
+  function setInputVal(id, val) {
+    document.querySelectorAll('input[data-item-id="' + id + '"]').forEach(function(el) { el.value = val; });
+  }
+  function setItemTotal(el, val) {
+    var fmt = val.toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+    el.querySelector('.item-total').textContent = fmt;
+  }
+  function setMsg(id, text) {
+    var d = document.getElementById('desktop-msg-' + id);
+    var m = document.getElementById('mobile-msg-' + id);
+    if (d) d.textContent = text;
+    if (m) m.textContent = text;
+  }
+  function updateGlobalTotal() {
+    var total = 0;
+    document.querySelectorAll('.cart-checkbox:checked').forEach(function(cb) {
+      var row = cb.closest('.cart-item-row');
+      if (!row) return;
+      var price = getUnitPrice(row);
+      var qty = parseInt(row.querySelector('.qty-input').value, 10) || 0;
+      total += price * qty;
+    });
+    document.getElementById('cart-total').textContent = total.toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+  }
 
-function checkout() {
-  var btn = document.getElementById('checkout-btn');
-  if (btn.disabled) return;
-  var form = document.getElementById('checkout-form');
-  form.innerHTML = '';
-  document.querySelectorAll('.cart-checkbox:checked').forEach(function(cb) {
-    var h = document.createElement('input');
-    h.type = 'hidden';
-    h.name = 'cart_item_ids[]';
-    h.value = cb.value;
-    form.appendChild(h);
-  });
-  form.submit();
-}
+  function sendUpdate(id, quantity) {
+    var row = findRow(id);
+    var max = getMaxQty(row);
+    if (quantity > max) {
+      setMsg(id, 'Доступно максимум ' + max + ' шт.');
+      setInputVal(id, max);
+      return;
+    }
+    setMsg(id, '');
 
-updateCartTotal();
+    var token = document.querySelector('meta[name="csrf-token"]') ? document.querySelector('meta[name="csrf-token"]').content : '';
+    fetch('/cart/update_item/' + id, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'X-CSRF-Token': token
+      },
+      body: JSON.stringify({ quantity: quantity })
+    }).then(function(r) {
+      if (!r.ok) return r.json().then(function(d) { throw d; });
+      return r.json();
+    }).then(function(data) {
+      setInputVal(id, data.quantity);
+      var fmt = data.item_total.toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+      document.querySelectorAll('.item-total').forEach(function(el) {
+        if (el.closest('.cart-item-row') && el.closest('.cart-item-row').dataset.itemId == id) {
+          el.textContent = fmt;
+        }
+      });
+      document.getElementById('cart-total').textContent = data.cart_total.toLocaleString('ru-RU', {minimumFractionDigits: 0, maximumFractionDigits: 0});
+      updateCheckoutBtnState();
+    }).catch(function(e) {
+      setMsg(id, e.error || 'Ошибка обновления');
+    });
+  }
+
+  function changeQtyDesktop(id, delta) {
+    var row = findRow(id);
+    var inp = row ? row.querySelector('.qty-input') : null;
+    if (!inp) return;
+    var val = (parseInt(inp.value, 10) || 0) + delta;
+    if (val < 1) val = 1;
+    sendUpdate(id, val);
+  }
+  function updateQtyDesktop(el, val) {
+    var id = el.dataset.itemId;
+    var v = parseInt(val, 10);
+    if (isNaN(v) || v < 1) v = 1;
+    sendUpdate(id, v);
+  }
+  function changeQtyMobile(id, delta) {
+    changeQtyDesktop(id, delta);
+  }
+  function updateQtyMobile(el, val) {
+    updateQtyDesktop(el, val);
+  }
+
+  function updateCheckoutBtnState() {
+    var count = document.querySelectorAll('.cart-checkbox:checked').length;
+    var btn = document.getElementById('checkout-btn');
+    if (!btn) return;
+    if (count === 0) {
+      btn.disabled = true; btn.classList.add('bg-gray-400', 'cursor-not-allowed');
+      btn.classList.remove('bg-accent', 'cursor-pointer');
+    } else {
+      btn.disabled = false; btn.classList.remove('bg-gray-400', 'cursor-not-allowed');
+      btn.classList.add('bg-accent', 'cursor-pointer');
+    }
+  }
+
+  function checkout() {
+    var btn = document.getElementById('checkout-btn');
+    if (btn.disabled) return;
+    var form = document.getElementById('checkout-form');
+    form.innerHTML = '';
+    document.querySelectorAll('.cart-checkbox:checked').forEach(function(cb) {
+      var h = document.createElement('input');
+      h.type = 'hidden'; h.name = 'cart_item_ids[]'; h.value = cb.value;
+      form.appendChild(h);
+    });
+    form.submit();
+  }
 </script>

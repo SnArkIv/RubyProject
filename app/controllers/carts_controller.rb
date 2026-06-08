@@ -44,12 +44,23 @@ class CartsController < ApplicationController
 
   def update_item
     @cart = current_cart
-    cart_item = @cart.cart_items.find(params[:id])
+    cart_item = @cart.cart_items.find_by(id: params[:id])
+    unless cart_item
+      respond_to do |format|
+        format.html { redirect_to cart_path, alert: "Товар не найден" }
+        format.json { render json: { error: "Товар не найден" }, status: :not_found }
+      end
+      return
+    end
+
     quantity = params[:quantity].to_i
     available = cart_item.product.stock_for_size(cart_item.size)
 
     if quantity > available
-      redirect_to cart_path, alert: "Недостаточно товара на складе (доступно: #{available} шт.)"
+      respond_to do |format|
+        format.html { redirect_to cart_path, alert: "Недостаточно товара на складе (доступно: #{available} шт.)" }
+        format.json { render json: { error: "Недостаточно товара (доступно: #{available})" }, status: :unprocessable_entity }
+      end
       return
     end
 
@@ -59,7 +70,19 @@ class CartsController < ApplicationController
       cart_item.destroy
     end
 
-    redirect_to cart_path, notice: "Корзина обновлена"
+    respond_to do |format|
+      format.html { redirect_to cart_path, notice: "Корзина обновлена" }
+      format.json do
+        @cart_items = current_cart.reload.cart_items.includes(:product)
+        render json: {
+          item_total: (cart_item.persisted? ? cart_item.product.final_price * cart_item.quantity : 0).round,
+          item_id: cart_item.id,
+          quantity: cart_item.persisted? ? cart_item.quantity : 0,
+          cart_total: @cart_items.sum { |ci| ci.product.final_price * ci.quantity }.round,
+          item_count: @cart_items.count
+        }
+      end
+    end
   end
 
   def remove_item
