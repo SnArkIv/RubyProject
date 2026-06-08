@@ -305,11 +305,18 @@
     form.submit();
   }
 
+  function updateSelectAllState() {
+    var all = Array.from(document.querySelectorAll('.cart-checkbox:not(#select-all)'));
+    var allChecked = all.length > 0 && all.every(function(cb) { return cb.checked; });
+    document.getElementById('select-all').checked = allChecked;
+  }
+
   // Bind listeners on load
   (function() {
-    document.querySelectorAll('.cart-checkbox').forEach(function(cb) {
+    document.querySelectorAll('.cart-checkbox:not(#select-all)').forEach(function(cb) {
       cb.addEventListener('change', function(e) {
         syncCheckbox(e.target);
+        updateSelectAllState();
         updateCartTotal();
       });
     });
